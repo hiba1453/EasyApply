@@ -1,0 +1,67 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: easyapply-backend
+  
+  # Configuration PostgreSQL
+  datasource:
+    url: jdbc:postgresql://localhost:5432/easyapply_db
+    username: postgres
+    password: Hibabalhirch1  # Remplace par ton mot de passe PostgreSQL
+    driver-class-name: org.postgresql.Driver
+  
+  # Configuration JPA/Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # create-drop pour dev, update pour prod
+    show-sql: true  # Afficher les requêtes SQL dans les logs
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  
+  # Configuration OAuth2 LinkedIn
+  security:
+    oauth2:
+      client:
+        registration:
+          linkedin:
+            client-id: ${LINKEDIN_CLIENT_ID:your-linkedin-client-id}
+            client-secret: ${LINKEDIN_CLIENT_SECRET:your-linkedin-client-secret}
+            scope: r_liteprofile,r_emailaddress
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:8080/login/oauth2/code/linkedin
+        provider:
+          linkedin:
+            authorization-uri: "https://www.linkedin.com/oauth/v2/authorization"
+            token-uri: "https://www.linkedin.com/oauth/v2/accessToken"
+            user-info-uri: https://api.linkedin.com/v2/me
+            user-name-attribute: id
+
+  # Configuration upload de fichiers
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+# Configuration JWT
+jwt:
+  secret: ${JWT_SECRET:easyApplySecretKey12345678901234567890123456789012345}
+  expiration: 86400000  # 24 heures en millisecondes
+
+# Configuration Swagger/OpenAPI
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+
+# Configuration des logs
+logging:
+  level:
+    com.easyapply: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
