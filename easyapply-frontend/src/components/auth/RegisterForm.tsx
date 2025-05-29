@@ -68,12 +68,33 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (validateForm()) {
       const { confirmPassword, ...submitData } = formData;
-      onSubmit(submitData);
+      try {
+        const response = await fetch('http://localhost:8081/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json',
+          },
+          body: JSON.stringify(submitData),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Erreur serveur :", errorData);
+          alert("Erreur lors de l'inscription : " + (errorData.message || "Vérifiez les champs."));
+        } else {
+          const result = await response.json();
+          console.log("Inscription réussie :", result);
+          alert("Inscription réussie !");
+        }
+      } catch (error) {
+        console.error("Erreur réseau :", error);
+        alert("Erreur réseau. Impossible de contacter le serveur.");
+      }
     }
   };
 
@@ -134,7 +155,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
         
         <div className="input-group">
           <label htmlFor="type" className="label">
-            Type de compte
+            type de compte
           </label>
           <div className="flex space-x-4 mt-1">
             <label className="flex items-center">

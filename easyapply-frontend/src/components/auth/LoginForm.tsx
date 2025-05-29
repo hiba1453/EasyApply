@@ -51,12 +51,34 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent)  => {
     e.preventDefault();
     
     if (validateForm()) {
-      onSubmit(formData);
+      try {
+        const response = await fetch('http://localhost:8081/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Erreur serveur :", errorData);
+          alert("Erreur lors de l'inscription : " + (errorData.message || "Vérifiez les champs."));
+        } else {
+          const result = await response.json();
+          console.log("Inscription réussie :", result);
+          alert("Inscription réussie !");
+        }
+      } catch (error) {
+        console.error("Erreur réseau :", error);
+        alert("Erreur réseau. Impossible de contacter le serveur.");
+      }
     }
+    
   };
 
   return (
