@@ -28,8 +28,8 @@ spring:
       client:
         registration:
           linkedin:
-            client-id: ${LINKEDIN_CLIENT_ID:your-linkedin-client-id}
-            client-secret: ${LINKEDIN_CLIENT_SECRET:your-linkedin-client-secret}
+            client-id: ${LINKEDIN_CLIENT_ID:78mgyh8hsww222}
+            client-secret: ${LINKEDIN_CLIENT_SECRET:WPL_AP1.gPa70EQui0DWJldW.PjmsYg==}
             scope: r_liteprofile,r_emailaddress
             authorization-grant-type: authorization_code
             redirect-uri: http://localhost:8080/login/oauth2/code/linkedin
@@ -39,7 +39,7 @@ spring:
             token-uri: "https://www.linkedin.com/oauth/v2/accessToken"
             user-info-uri: https://api.linkedin.com/v2/me
             user-name-attribute: id
-
+  
   # Configuration upload de fichiers
   servlet:
     multipart:

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.HashMap;
+import java.time.LocalDateTime;
 
 @Service
 @Transactional
@@ -116,9 +117,9 @@ public class UserService {
         return false;
     }
 
-    // ✅ GESTION LINKEDIN OAUTH
-    public User createOrUpdateUserFromLinkedIn(String email, String linkedinToken, 
-                                              String firstName, String lastName) {
+    // ✅ GESTION LINKEDIN OAUTH - AMÉLIORÉE
+    public User createUserFromLinkedIn(String email, String linkedinToken, 
+                                      String firstName, String lastName) {
         Optional<User> existingUser = userRepository.findByEmail(email);
         
         if (existingUser.isPresent()) {
@@ -130,7 +131,7 @@ public class UserService {
             // Créer un nouveau utilisateur
             User user = new User();
             user.setEmail(email);
-            user.setPassword(passwordEncoder.encode("linkedin-oauth")); // Mot de passe temporaire
+            user.setPassword(passwordEncoder.encode("linkedin-oauth-" + System.currentTimeMillis())); 
             user.setFirstName(firstName);
             user.setLastName(lastName);
             user.setLinkedinToken(linkedinToken);
@@ -208,6 +209,15 @@ public class UserService {
 
     public List<User> getUsersByRole(User.Role role) {
         return userRepository.findByRole(role);
+    }
+
+    public List<User> getRecentUsers() {
+        // Implémentation alternative en Java pour éviter les problèmes HQL
+        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
+        return userRepository.findAll().stream()
+            .filter(u -> u.getCreatedAt().isAfter(thirtyDaysAgo))
+            .sorted((u1, u2) -> u2.getCreatedAt().compareTo(u1.getCreatedAt()))
+            .toList();
     }
 
     // ✅ SUPPRESSION UTILISATEUR

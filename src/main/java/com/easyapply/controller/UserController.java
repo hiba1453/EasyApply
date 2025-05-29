@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Users", description = "API de gestion des utilisateurs et profils")
 public class UserController {
 
-    @GetMapping("/profile")
+    @GetMapping("/getprofile")
     @Operation(summary = "Profil utilisateur", 
                description = "Récupérer le profil de l'utilisateur connecté")
     public ResponseEntity<?> getProfile() {
