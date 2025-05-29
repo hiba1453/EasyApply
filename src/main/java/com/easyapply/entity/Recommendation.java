@@ -1,9 +1,18 @@
 package com.easyapply.entity;
 
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "recommendations")
@@ -13,11 +22,15 @@ public class Recommendation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    // ✅ REMPLACE userId par relation ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
     
-    @Column(name = "job_id", nullable = false)
-    private Long jobId;
+    // ✅ REMPLACE jobId par relation ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "job_id", nullable = false)
+    private Job job;
     
     @Column(name = "match_score", nullable = false)
     private Double matchScore;
@@ -35,9 +48,9 @@ public class Recommendation {
     // Constructeurs
     public Recommendation() {}
     
-    public Recommendation(Long userId, Long jobId, Double matchScore) {
-        this.userId = userId;
-        this.jobId = jobId;
+    public Recommendation(User user, Job job, Double matchScore) {
+        this.user = user;
+        this.job = job;
         this.matchScore = matchScore;
     }
     
@@ -45,11 +58,12 @@ public class Recommendation {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
+    // ✅ NOUVEAUX GETTERS/SETTERS POUR LES RELATIONS
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
     
-    public Long getJobId() { return jobId; }
-    public void setJobId(Long jobId) { this.jobId = jobId; }
+    public Job getJob() { return job; }
+    public void setJob(Job job) { this.job = job; }
     
     public Double getMatchScore() { return matchScore; }
     public void setMatchScore(Double matchScore) { this.matchScore = matchScore; }
@@ -61,4 +75,13 @@ public class Recommendation {
     public void setIsViewed(Boolean isViewed) { this.isViewed = isViewed; }
     
     public LocalDateTime getCreatedAt() { return createdAt; }
+    
+    // ✅ MÉTHODES DE COMPATIBILITÉ (pour ne pas casser le code existant)
+    public Long getUserId() { 
+        return user != null ? user.getId() : null; 
+    }
+    
+    public Long getJobId() { 
+        return job != null ? job.getId() : null; 
+    }
 }

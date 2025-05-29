@@ -6,6 +6,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "jobs")
@@ -47,6 +49,19 @@ public class Job {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    
+    // ✅ NOUVELLE RELATION VERS ENTREPRISE
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "entreprise_id")
+    private Entreprise entreprise;
+    
+    // ✅ NOUVELLE RELATION VERS APPLICATIONS
+    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Application> applications = new ArrayList<>();
+    
+    // ✅ NOUVELLE RELATION VERS RECOMMENDATIONS
+    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Recommendation> recommendations = new ArrayList<>();
     
     public enum ContractType {
         CDI, CDD, FREELANCE, STAGE
@@ -96,4 +111,35 @@ public class Job {
     
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
+    
+    // ✅ NOUVEAUX GETTERS/SETTERS POUR LES RELATIONS
+    public Entreprise getEntreprise() { return entreprise; }
+    public void setEntreprise(Entreprise entreprise) { this.entreprise = entreprise; }
+    
+    public List<Application> getApplications() { return applications; }
+    public void setApplications(List<Application> applications) { this.applications = applications; }
+    
+    public List<Recommendation> getRecommendations() { return recommendations; }
+    public void setRecommendations(List<Recommendation> recommendations) { this.recommendations = recommendations; }
+    
+    // ✅ MÉTHODES UTILITAIRES POUR GÉRER LES RELATIONS
+    public void addApplication(Application application) {
+        applications.add(application);
+        application.setJob(this);
+    }
+    
+    public void removeApplication(Application application) {
+        applications.remove(application);
+        application.setJob(null);
+    }
+    
+    public void addRecommendation(Recommendation recommendation) {
+        recommendations.add(recommendation);
+        recommendation.setJob(this);
+    }
+    
+    public void removeRecommendation(Recommendation recommendation) {
+        recommendations.remove(recommendation);
+        recommendation.setJob(null);
+    }
 }
