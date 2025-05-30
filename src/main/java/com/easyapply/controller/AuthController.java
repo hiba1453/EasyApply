@@ -24,7 +24,7 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UserService userService;
-    @PostMapping("/register")
+    @PostMapping(value ="/register" , consumes = "application/json")
     @Operation(summary = "Inscription d'un nouvel utilisateur", 
                description = "Créer un nouveau compte utilisateur sur EasyApply")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {

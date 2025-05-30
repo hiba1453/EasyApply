@@ -77,9 +77,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
         const response = await fetch('http://localhost:8081/api/auth/register', {
            mode: 'no-cors',
           method: 'POST',
-          headers: {
-            'Content-type': 'application/json',
-          },
+         
           body: JSON.stringify(submitData),
         });
 
