@@ -5,6 +5,7 @@ import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import Button from '../components/ui/Button';
 
+
 const Landing: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
@@ -78,17 +79,18 @@ const Landing: React.FC = () => {
               <p className="text-gray-600 mb-4">
                 Créez et optimisez votre CV pour maximiser vos chances d'être remarqué par les recruteurs.
               </p>
-              <Link to="/features/resume" className="inline-flex items-center text-primary-600 font-medium">
+              <Link to="/dashboard/candidate/resume" className="inline-flex items-center text-primary-600 font-medium">
                 En savoir plus <ChevronRight className="w-4 h-4 ml-1" />
               </Link>
             </div>
             
             {/* Feature 3 */}
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md">
+           
+<div className="bg-white rounded-lg p-8 shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md">
               <div className="w-14 h-14 bg-primary-50 rounded-lg flex items-center justify-center mb-6">
                 <Users className="w-7 h-7 text-primary-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Réseau professionnel</h3>
+              <a href="https://linkedin.com" className="text-xl font-semibold mb-3">Réseau professionnel</a>
               <p className="text-gray-600 mb-4">
                 Connectez-vous avec des professionnels de votre secteur et développez votre réseau pour saisir de nouvelles opportunités.
               </p>
@@ -96,6 +98,7 @@ const Landing: React.FC = () => {
                 En savoir plus <ChevronRight className="w-4 h-4 ml-1" />
               </Link>
             </div>
+
           </div>
         </div>
       </section>
@@ -149,37 +152,6 @@ const Landing: React.FC = () => {
         </div>
       </section>
       
-      {/* Companies Section */}
-      <section className="py-16 md:py-24 bg-white">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Entreprises partenaires
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Rejoignez des milliers de candidats qui ont trouvé leur emploi idéal
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 items-center justify-items-center">
-            <div className="grayscale hover:grayscale-0 transition-all duration-300">
-              <img src="https://images.pexels.com/photos/15031232/pexels-photo-15031232.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="TechStart" className="h-12 object-contain" />
-            </div>
-            <div className="grayscale hover:grayscale-0 transition-all duration-300">
-              <img src="https://images.pexels.com/photos/6224/hands-people-woman-working.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="DesignLab" className="h-12 object-contain" />
-            </div>
-            <div className="grayscale hover:grayscale-0 transition-all duration-300">
-              <img src="https://images.pexels.com/photos/1181467/pexels-photo-1181467.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="DataInsight" className="h-12 object-contain" />
-            </div>
-            <div className="grayscale hover:grayscale-0 transition-all duration-300">
-              <img src="https://images.pexels.com/photos/1148820/pexels-photo-1148820.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="CloudNative" className="h-12 object-contain" />
-            </div>
-            <div className="grayscale hover:grayscale-0 transition-all duration-300">
-              <img src="https://images.pexels.com/photos/3183186/pexels-photo-3183186.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="ProductHive" className="h-12 object-contain" />
-            </div>
-          </div>
-        </div>
-      </section>
       
       {/* CTA Section */}
       <section className="py-16 md:py-20 bg-primary-800">
@@ -198,7 +170,7 @@ const Landing: React.FC = () => {
                     Créer un compte
                   </Button>
                 </Link>
-                <Link to="/jobs">
+                <Link to="/dashboard/candidate/jobs">
                   <Button 
                     variant="outline" 
                     size="lg" 

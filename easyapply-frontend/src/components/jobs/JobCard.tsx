@@ -57,7 +57,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, showActions = true }) => {
         
         {showActions && (
           <div className="flex flex-col md:flex-row gap-2 mt-4 md:mt-0">
-            <Link to={`/jobs/${id}`}>
+            <Link to={`/dashboard/candidate/jobs/${id}`}>
               <Button variant="secondary" size="sm">Voir détails</Button>
             </Link>
             <Link to={`/apply/${id}`}>

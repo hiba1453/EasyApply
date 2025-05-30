@@ -40,7 +40,7 @@ const Header: React.FC = () => {
                 <Link to="/" className="text-gray-700 hover:text-primary-600 font-medium">
                   Accueil
                 </Link>
-                <Link to="/jobs" className="text-gray-700 hover:text-primary-600 font-medium">
+                <Link to="/dashboard/candidate/jobs" className="text-gray-700 hover:text-primary-600 font-medium">
                   Offres
                 </Link>
                 <Link to="/companies" className="text-gray-700 hover:text-primary-600 font-medium">
@@ -48,6 +48,9 @@ const Header: React.FC = () => {
                 </Link>
                 <Link to="/about" className="text-gray-700 hover:text-primary-600 font-medium">
                   À propos
+                </Link>
+                <Link to="/dashboard/candidate/jobs/" className="text-gray-700 hover:text-primary-600 font-medium">
+                  Dashboard
                 </Link>
               </nav>
 
@@ -104,7 +107,7 @@ const Header: React.FC = () => {
                 Accueil
               </Link>
               <Link 
-                to="/jobs" 
+                to="/dashboard/candidate/jobs" 
                 className="text-gray-700 hover:text-primary-600 font-medium py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
