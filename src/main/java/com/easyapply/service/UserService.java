@@ -38,7 +38,7 @@ public class UserService {
     }
 
     // ✅ INSCRIPTION UTILISATEUR
-    public User createUser(String email, String password, String firstName, String lastName) {
+    public  User createUser(String email, String password, String firstName, String lastName) {
         // Vérifier si l'email existe déjà
         if (userRepository.existsByEmail(email)) {
             throw new RuntimeException("Email déjà utilisé");
@@ -53,13 +53,13 @@ public class UserService {
         user.setRole(User.Role.CANDIDATE);
         user.setIsActive(true);
 
-        User savedUser = userRepository.save(user);
+        
 
         // Créer un profil vide pour l'utilisateur
-        Profile profile = new Profile(savedUser);
-        savedUser.setProfile(profile);
+        Profile profile = new Profile(user);
+        user.setProfile(profile);
         
-        return userRepository.save(savedUser);
+        return userRepository.save(user);
     }
 
     // ✅ MISE À JOUR PROFIL
