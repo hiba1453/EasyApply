@@ -75,20 +75,25 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
 
       try {
         const response = await fetch('http://localhost:8081/api/auth/register', {
-           mode: 'no-cors',
+          
           method: 'POST',
-         
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify(submitData),
         });
 
-        const result = await response.json();
+        
 
         if (!response.ok) {
-          console.error("Erreur serveur :", result);
-          alert("Erreur lors de l'inscription : " + (result.error || "Vérifiez les champs."));
+          const errorData = await response.text(); // Use text() to handle non-JSON responses
+          console.error("Erreur serveur :", errorData);
+          alert("Erreur lors de l'inscription : " + (errorData || "Vérifiez les champs."));
+          return;
         } else {
-          console.log("Inscription réussie :", result);
-          alert("Inscription réussie !");
+          const result = await response.json();
+        console.log("Inscription réussie :", result);
+        alert("Inscription réussie !");
           if (onSubmit) onSubmit(result);
         }
       } catch (error) {
