@@ -18,6 +18,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.security.Key;
+import java.time.Instant;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -31,15 +37,13 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
+   
 
     @Value("${jwt.expiration}")
     private Long jwtExpiration;
 
-    private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
-    }
+   
+  
 
     // ✅ AUTHENTIFICATION UTILISATEUR (CANDIDAT)
     public Map<String, Object> authenticateUser(String email, String password) {
@@ -59,7 +63,6 @@ public class AuthService {
             throw new RuntimeException("Email ou mot de passe incorrect");
         }
         
-        // Générer le token JWT
         String token = generateJwtToken(user.getId(), user.getEmail(), "USER", user.getRole().toString());
         
         Map<String, Object> response = new HashMap<>();
@@ -73,6 +76,13 @@ public class AuthService {
         ));
         
         return response;
+    }
+
+
+    private final Key signingKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+
+    private Key getSigningKey() {
+        return signingKey;
     }
 
     // ✅ AUTHENTIFICATION ENTREPRISE
@@ -109,20 +119,19 @@ public class AuthService {
         return response;
     }
 
-    // ✅ GÉNÉRATION TOKEN JWT
-    public String generateJwtToken(Long userId, String email, String userType, String role) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpiration);
+  private String generateJwtToken(Long id, String email, String type, String role) {
+        Instant now = Instant.now();
+        Instant expiration = now.plusSeconds(jwtExpiration);
 
         return Jwts.builder()
-                .setSubject(email)
-                .claim("userId", userId)
-                .claim("userType", userType) // USER ou ENTREPRISE
-                .claim("role", role)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(getSigningKey(), SignatureAlgorithm.HS512)
-                .compact();
+            .setSubject(email)
+            .claim("id", id)
+            .claim("type", type)
+            .claim("role", role)
+            .setIssuedAt(Date.from(now))
+            .setExpiration(Date.from(expiration))
+            .signWith(getSigningKey(), SignatureAlgorithm.HS512) // Explicitly specify HS512
+            .compact();
     }
 
     // ✅ VALIDATION TOKEN JWT

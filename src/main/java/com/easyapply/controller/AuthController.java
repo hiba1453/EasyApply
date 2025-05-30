@@ -34,6 +34,8 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UserService userService;
+    @Autowired
+    private AuthService authService;
 
     @PostMapping("/register")
     @Operation(summary = "Inscription d'un nouvel utilisateur", 
@@ -99,10 +101,13 @@ public class AuthController {
             if (request.getEmail() == null || request.getPassword() == null) {
                 return ResponseEntity.badRequest()
                     .body(Map.of("error", "Email et mot de passe requis"));
+            }if (request.getPassword() == null || request.getPassword().isEmpty()) {
+                return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Mot de passe est requis"));
             }
 
             // ✅ UTILISER LE SERVICE RÉEL POUR L'AUTHENTIFICATION
-            AuthService authService = new AuthService();
+            
             Map<String, Object> authResult = authService.authenticateUser(request.getEmail(), request.getPassword());
             return ResponseEntity.ok(Map.of(
                 "message", "Connexion réussie !",
@@ -114,6 +119,7 @@ public class AuthController {
             return ResponseEntity.status(401)
                 .body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.internalServerError()
                 .body(Map.of("error", "Erreur lors de la connexion: " + e.getMessage()));
         }
