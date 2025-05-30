@@ -1,22 +1,47 @@
 package com.easyapply.controller;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.easyapply.entity.Job;
+import com.easyapply.entity.Job.ContractType;
+import com.easyapply.service.AuthService;
+import com.easyapply.service.JobService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import com.easyapply.entity.Job;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.*;
 
 @RestController
 @RequestMapping("/api/jobs")
 @CrossOrigin(origins = "*")
 @Tag(name = "Jobs", description = "API de gestion des offres d'emploi")
 public class JobController {
+
+    @Autowired
+    private JobService jobService;
+    
+    @Autowired
+    private AuthService authService;
 
     @GetMapping
     @Operation(summary = "Liste des offres d'emploi", 
@@ -27,95 +52,45 @@ public class JobController {
             @Parameter(description = "Type de contrat (CDI, CDD, FREELANCE, STAGE)")
             @RequestParam(required = false) String contractType,
             @Parameter(description = "Entreprise pour filtrer les offres")
-            @RequestParam(required = false) String company) {
+            @RequestParam(required = false) String company,
+            @Parameter(description = "Salaire minimum")
+            @RequestParam(required = false) BigDecimal minSalary,
+            @Parameter(description = "Page (défaut: 0)")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Taille page (défaut: 20)")
+            @RequestParam(defaultValue = "20") int size) {
         
         try {
-            // Simulation de données d'offres d'emploi
-            List<Map<String, Object>> jobs = new ArrayList<>();
-            
-            // Offre 1
-            Map<String, Object> job1 = new HashMap<>();
-            job1.put("id", 1L);
-            job1.put("title", "Développeur Full Stack Java/React");
-            job1.put("company", "TechCorp");
-            job1.put("location", "Paris, France");
-            job1.put("salary", 45000);
-            job1.put("contractType", "CDI");
-            job1.put("status", "ACTIVE");
-            job1.put("description", "Rejoignez notre équipe pour développer des applications web modernes avec Java Spring Boot et React.");
-            job1.put("requirements", "3+ ans d'expérience en Java, Spring Boot, React, PostgreSQL");
-            job1.put("createdAt", LocalDateTime.now().minusDays(2));
-            
-            // Offre 2
-            Map<String, Object> job2 = new HashMap<>();
-            job2.put("id", 2L);
-            job2.put("title", "Data Scientist Python");
-            job2.put("company", "DataInnovation");
-            job2.put("location", "Lyon, France");
-            job2.put("salary", 52000);
-            job2.put("contractType", "CDI");
-            job2.put("status", "ACTIVE");
-            job2.put("description", "Analyser des données massives et développer des modèles d'IA pour nos clients.");
-            job2.put("requirements", "Python, Machine Learning, TensorFlow, SQL, 2+ ans d'expérience");
-            job2.put("createdAt", LocalDateTime.now().minusDays(5));
-            
-            // Offre 3
-            Map<String, Object> job3 = new HashMap<>();
-            job3.put("id", 3L);
-            job3.put("title", "Stage Développement Mobile");
-            job3.put("company", "MobileStart");
-            job3.put("location", "Marseille, France");
-            job3.put("salary", 1200);
-            job3.put("contractType", "STAGE");
-            job3.put("status", "ACTIVE");
-            job3.put("description", "Développer des applications mobiles avec React Native et Flutter.");
-            job3.put("requirements", "Étudiant en informatique, React Native ou Flutter, motivation");
-            job3.put("createdAt", LocalDateTime.now().minusDays(1));
-            
-            // Offre 4 - EasyApply meta 😊
-            Map<String, Object> job4 = new HashMap<>();
-            job4.put("id", 4L);
-            job4.put("title", "Backend Developer Spring Boot");
-            job4.put("company", "EasyApply");
-            job4.put("location", "Remote, France");
-            job4.put("salary", 48000);
-            job4.put("contractType", "CDI");
-            job4.put("status", "ACTIVE");
-            job4.put("description", "Développer l'API backend de la plateforme EasyApply avec Spring Boot et PostgreSQL.");
-            job4.put("requirements", "Spring Boot, PostgreSQL, API REST, JWT, expérience 2+ ans");
-            job4.put("createdAt", LocalDateTime.now());
-            
-            jobs.add(job1);
-            jobs.add(job2);
-            jobs.add(job3);
-            jobs.add(job4);
-            
-            // Filtrage basique (simulation)
-            if (location != null && !location.isEmpty()) {
-                jobs = jobs.stream()
-                    .filter(job -> job.get("location").toString().toLowerCase().contains(location.toLowerCase()))
-                    .toList();
-            }
-            
+            // ✅ UTILISER LE SERVICE RÉEL AVEC PAGINATION
+            ContractType contractTypeEnum = null;
             if (contractType != null && !contractType.isEmpty()) {
-                jobs = jobs.stream()
-                    .filter(job -> job.get("contractType").toString().equalsIgnoreCase(contractType))
-                    .toList();
+                try {
+                    contractTypeEnum = ContractType.valueOf(contractType.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Type de contrat invalide: " + contractType));
+                }
             }
+
+            PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdAt").descending());
+            Page<Job> jobsPage = jobService.searchJobs(location, contractTypeEnum, company, minSalary, pageRequest);
             
-            if (company != null && !company.isEmpty()) {
-                jobs = jobs.stream()
-                    .filter(job -> job.get("company").toString().toLowerCase().contains(company.toLowerCase()))
-                    .toList();
-            }
+            // ✅ CONSTRUIRE LA RÉPONSE AVEC LES VRAIES DONNÉES
+            List<Map<String, Object>> jobsList = jobsPage.getContent().stream()
+                .map(this::convertJobToMap)
+                .collect(Collectors.toList());
             
             Map<String, Object> response = new HashMap<>();
-            response.put("jobs", jobs);
-            response.put("total", jobs.size());
+            response.put("jobs", jobsList);
+            response.put("total", jobsPage.getTotalElements());
+            response.put("page", page);
+            response.put("size", size);
+            response.put("totalPages", jobsPage.getTotalPages());
             response.put("filters", Map.of(
                 "location", location != null ? location : "Toutes",
                 "contractType", contractType != null ? contractType : "Tous",
-                "company", company != null ? company : "Toutes"
+                "company", company != null ? company : "Toutes",
+                "minSalary", minSalary != null ? minSalary : "Aucun minimum"
             ));
             
             return ResponseEntity.ok(response);
@@ -134,47 +109,17 @@ public class JobController {
             @PathVariable Long id) {
         
         try {
-            // Simulation de récupération d'une offre par ID
-            Map<String, Object> job = new HashMap<>();
+            // ✅ RÉCUPÉRER L'OFFRE RÉELLE DEPUIS LA BASE DE DONNÉES
+            Optional<Job> jobOpt = jobService.getJobById(id);
             
-            switch (id.intValue()) {
-                case 1:
-                    job.put("id", 1L);
-                    job.put("title", "Développeur Full Stack Java/React");
-                    job.put("company", "TechCorp");
-                    job.put("location", "Paris, France");
-                    job.put("salary", 45000);
-                    job.put("contractType", "CDI");
-                    job.put("status", "ACTIVE");
-                    job.put("description", "Rejoignez notre équipe pour développer des applications web modernes avec Java Spring Boot et React. Vous travaillerez sur des projets innovants dans un environnement agile.");
-                    job.put("requirements", "3+ ans d'expérience en Java, Spring Boot, React, PostgreSQL. Connaissance de Docker et AWS appréciée.");
-                    job.put("benefits", "Télétravail partiel, mutuelle, tickets restaurant, formation continue");
-                    job.put("applicationDeadline", LocalDateTime.now().plusDays(30));
-                    job.put("viewCount", 156);
-                    job.put("applicationCount", 23);
-                    break;
-                    
-                case 2:
-                    job.put("id", 2L);
-                    job.put("title", "Data Scientist Python");
-                    job.put("company", "DataInnovation");
-                    job.put("location", "Lyon, France");
-                    job.put("salary", 52000);
-                    job.put("contractType", "CDI");
-                    job.put("status", "ACTIVE");
-                    job.put("description", "Analyser des données massives et développer des modèles d'IA pour nos clients dans divers secteurs.");
-                    job.put("requirements", "Python, Machine Learning, TensorFlow, SQL, 2+ ans d'expérience en data science");
-                    job.put("benefits", "Stock options, bureau moderne, équipe jeune et dynamique");
-                    job.put("applicationDeadline", LocalDateTime.now().plusDays(20));
-                    job.put("viewCount", 89);
-                    job.put("applicationCount", 12);
-                    break;
-                    
-                default:
-                    return ResponseEntity.notFound().build();
+            if (jobOpt.isEmpty()) {
+                return ResponseEntity.notFound().build();
             }
             
-            return ResponseEntity.ok(job);
+            Job job = jobOpt.get();
+            Map<String, Object> jobMap = convertJobToDetailedMap(job);
+            
+            return ResponseEntity.ok(jobMap);
             
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
@@ -185,7 +130,9 @@ public class JobController {
     @PostMapping
     @Operation(summary = "Créer une nouvelle offre d'emploi", 
                description = "Créer une nouvelle offre d'emploi (réservé aux entreprises)")
-    public ResponseEntity<?> createJob(@RequestBody CreateJobRequest request) {
+    public ResponseEntity<?> createJob(
+            @RequestBody CreateJobRequest request,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
             // Validation basique
             if (request.getTitle() == null || request.getTitle().isEmpty()) {
@@ -197,25 +144,48 @@ public class JobController {
                 return ResponseEntity.badRequest()
                     .body(Map.of("error", "Nom de l'entreprise requis"));
             }
-            
-            // Simulation de création d'offre
-            Map<String, Object> newJob = new HashMap<>();
-            newJob.put("id", System.currentTimeMillis()); // ID généré
-            newJob.put("title", request.getTitle());
-            newJob.put("company", request.getCompany());
-            newJob.put("location", request.getLocation());
-            newJob.put("description", request.getDescription());
-            newJob.put("requirements", request.getRequirements());
-            newJob.put("salary", request.getSalary());
-            newJob.put("contractType", request.getContractType() != null ? request.getContractType() : "CDI");
-            newJob.put("status", "ACTIVE");
-            newJob.put("createdAt", LocalDateTime.now());
-            newJob.put("viewCount", 0);
-            newJob.put("applicationCount", 0);
+
+            // ✅ RÉCUPÉRER L'ENTREPRISE DEPUIS LE TOKEN (SI FOURNI)
+            Long entrepriseId = null;
+            if (authHeader != null) {
+                try {
+                    String token = authHeader.replace("Bearer ", "");
+                    if (authService.validateJwtToken(token)) {
+                        String userType = authService.getUserTypeFromToken(token);
+                        if ("ENTREPRISE".equals(userType)) {
+                            entrepriseId = authService.getUserIdFromToken(token);
+                        }
+                    }
+                } catch (Exception e) {
+                    // Token invalide, continuer sans entreprise associée
+                }
+            }
+
+            // ✅ CRÉER L'OFFRE RÉELLEMENT
+            ContractType contractType = ContractType.CDI;
+            if (request.getContractType() != null) {
+                try {
+                    contractType = ContractType.valueOf(request.getContractType().toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Type de contrat invalide"));
+                }
+            }
+
+            Job newJob = jobService.createJob(
+                entrepriseId,
+                request.getTitle(),
+                request.getDescription(),
+                request.getLocation(),
+                request.getCompany(),
+                request.getSalary(),
+                request.getRequirements(),
+                contractType
+            );
             
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Offre d'emploi créée avec succès !");
-            response.put("job", newJob);
+            response.put("job", convertJobToDetailedMap(newJob));
             
             return ResponseEntity.ok(response);
             
@@ -229,21 +199,85 @@ public class JobController {
     @Operation(summary = "Statistiques des offres d'emploi", 
                description = "Obtenir des statistiques générales sur les offres d'emploi")
     public ResponseEntity<?> getJobStats() {
-        Map<String, Object> stats = new HashMap<>();
-        stats.put("totalJobs", 4);
-        stats.put("activeJobs", 4);
-        stats.put("totalViews", 245);
-        stats.put("totalApplications", 35);
-        stats.put("topLocations", Arrays.asList("Paris", "Lyon", "Marseille"));
-        stats.put("topCompanies", Arrays.asList("TechCorp", "DataInnovation", "EasyApply"));
-        stats.put("contractTypes", Map.of(
-            "CDI", 3,
-            "CDD", 0,
-            "FREELANCE", 0,
-            "STAGE", 1
-        ));
+        try {
+            // ✅ RÉCUPÉRER LES VRAIES STATISTIQUES
+            Map<String, Object> stats = jobService.getJobStatistics();
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                .body(Map.of("error", "Erreur lors de la récupération des statistiques: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Recherche avancée d'offres", 
+               description = "Rechercher des offres par mots-clés")
+    public ResponseEntity<?> searchJobs(
+            @Parameter(description = "Mots-clés de recherche")
+            @RequestParam String keyword) {
+        try {
+            // ✅ RECHERCHE RÉELLE DANS LA BASE DE DONNÉES
+            List<Job> jobs = jobService.searchJobsByKeyword(keyword);
+            
+            List<Map<String, Object>> jobsList = jobs.stream()
+                .map(this::convertJobToMap)
+                .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(Map.of(
+                "jobs", jobsList,
+                "total", jobsList.size(),
+                "keyword", keyword
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                .body(Map.of("error", "Erreur lors de la recherche: " + e.getMessage()));
+        }
+    }
+
+    // ✅ MÉTHODES UTILITAIRES POUR CONVERTIR LES ENTITÉS
+    private Map<String, Object> convertJobToMap(Job job) {
+        Map<String, Object> jobMap = new HashMap<>();
+        jobMap.put("id", job.getId());
+        jobMap.put("title", job.getTitle());
+        jobMap.put("company", job.getCompany());
+        jobMap.put("location", job.getLocation());
+        jobMap.put("salary", job.getSalary());
+        jobMap.put("contractType", job.getContractType());
+        jobMap.put("status", job.getStatus());
+        jobMap.put("createdAt", job.getCreatedAt());
+        jobMap.put("description", job.getDescription().length() > 200 ? 
+            job.getDescription().substring(0, 200) + "..." : job.getDescription());
+        return jobMap;
+    }
+    
+    private Map<String, Object> convertJobToDetailedMap(Job job) {
+        Map<String, Object> jobMap = new HashMap<>();
+        jobMap.put("id", job.getId());
+        jobMap.put("title", job.getTitle());
+        jobMap.put("company", job.getCompany());
+        jobMap.put("location", job.getLocation());
+        jobMap.put("salary", job.getSalary());
+        jobMap.put("contractType", job.getContractType());
+        jobMap.put("status", job.getStatus());
+        jobMap.put("description", job.getDescription());
+        jobMap.put("requirements", job.getRequirements());
+        jobMap.put("createdAt", job.getCreatedAt());
+        jobMap.put("updatedAt", job.getUpdatedAt());
         
-        return ResponseEntity.ok(stats);
+        // Informations supplémentaires
+        jobMap.put("applicationCount", job.getApplications().size());
+        jobMap.put("canApply", job.getStatus() == Job.JobStatus.ACTIVE);
+        
+        // Informations entreprise si disponible
+        if (job.getEntreprise() != null) {
+            jobMap.put("entreprise", Map.of(
+                "id", job.getEntreprise().getId(),
+                "nom", job.getEntreprise().getNom(),
+                "secteur", job.getEntreprise().getSecteur() != null ? job.getEntreprise().getSecteur() : ""
+            ));
+        }
+        
+        return jobMap;
     }
 
     // Classe DTO pour créer une offre
