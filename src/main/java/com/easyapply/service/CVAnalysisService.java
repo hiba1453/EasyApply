@@ -1,18 +1,22 @@
 package com.easyapply.service;
 
-import com.easyapply.entity.CV;
-import com.easyapply.entity.User;
-import com.easyapply.entity.Profile;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 public class CVAnalysisService {
@@ -20,9 +24,17 @@ public class CVAnalysisService {
     @Autowired
     private UserService userService;
 
-    // ✅ EXTRACTION TEXTE DU PDF
+    // ✅ EXTRACTION TEXTE DU PDF (MultipartFile)
     public String extractTextFromPDF(MultipartFile file) throws IOException {
         try (PDDocument document = PDDocument.load(file.getInputStream())) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            return stripper.getText(document);
+        }
+    }
+
+    // ✅ NOUVELLE MÉTHODE - EXTRACTION TEXTE DU PDF (Path)
+    public String extractTextFromFile(Path filePath) throws IOException {
+        try (PDDocument document = PDDocument.load(Files.newInputStream(filePath))) {
             PDFTextStripper stripper = new PDFTextStripper();
             return stripper.getText(document);
         }
@@ -283,18 +295,21 @@ public class CVAnalysisService {
             Map<String, Object> profileUpdates = new HashMap<>();
             
             // Compétences
+            @SuppressWarnings("unchecked")
             Set<String> skills = (Set<String>) cvAnalysis.get("technicalSkills");
             if (skills != null && !skills.isEmpty()) {
                 profileUpdates.put("skills", String.join(", ", skills));
             }
             
             // Expériences
+            @SuppressWarnings("unchecked")
             List<String> experiences = (List<String>) cvAnalysis.get("experiences");
             if (experiences != null && !experiences.isEmpty()) {
                 profileUpdates.put("experiences", String.join("\n", experiences));
             }
             
             // Formations
+            @SuppressWarnings("unchecked")
             List<String> educations = (List<String>) cvAnalysis.get("educations");
             if (educations != null && !educations.isEmpty()) {
                 profileUpdates.put("formations", String.join("\n", educations));
@@ -307,6 +322,7 @@ public class CVAnalysisService {
             }
             
             // Générer un résumé automatique
+            @SuppressWarnings("unchecked")
             List<String> recommendedPositions = (List<String>) cvAnalysis.get("recommendedPositions");
             if (recommendedPositions != null && !recommendedPositions.isEmpty()) {
                 String summary = "Profil " + recommendedPositions.get(0) + 
@@ -328,8 +344,10 @@ public class CVAnalysisService {
     public List<Map<String, Object>> generateJobRecommendations(Map<String, Object> cvAnalysis) {
         List<Map<String, Object>> recommendations = new ArrayList<>();
         
+        @SuppressWarnings("unchecked")
         Set<String> skills = (Set<String>) cvAnalysis.get("technicalSkills");
         Integer experienceLevel = (Integer) cvAnalysis.get("experienceLevel");
+        @SuppressWarnings("unchecked")
         Map<String, Double> domainScores = (Map<String, Double>) cvAnalysis.get("domainScores");
         
         // Générer des recommandations basées sur les scores de domaine
