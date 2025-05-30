@@ -75,17 +75,20 @@ public class LinkedInController {
             String jwtToken = authService.generateJwtToken(
                 savedUser.getId(),
                 savedUser.getEmail(),
-                "USER",
+                "EasyApply",
+               
+
+               
                 savedUser.getRole().toString()
             );
             
             // 7. Générer recommandations basées sur le profil
             Map<String, Object> recommendations = linkedInService.generateRecommendationsFromProfile(profile);
             
-            // 8. Réponse complète
+            //Réponse 8.  complète
             return ResponseEntity.ok(Map.of(
                 "message", "Profil LinkedIn importé avec succès !",
-                "token", jwtToken,
+                "token", "b",//Réponse 8
                 "user", Map.of(
                     "id", savedUser.getId(),
                     "email", savedUser.getEmail(),

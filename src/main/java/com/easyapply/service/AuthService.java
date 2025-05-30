@@ -119,7 +119,7 @@ public class AuthService {
         return response;
     }
 
-  private String generateJwtToken(Long id, String email, String type, String role) {
+  public String generateJwtToken(Long id, String email, String type, String role) {
         Instant now = Instant.now();
         Instant expiration = now.plusSeconds(jwtExpiration);
 
