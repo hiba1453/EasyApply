@@ -141,7 +141,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
       {/* Bouton LinkedIn */}
       <div className="mt-6">
         <button
-          onClick={() => window.location.href = 'http://localhost:8081/api/linkedin/import-profile'}
+          onClick={() => window.location.href = 'http://localhost:8081/oauth2/authorization/linkedin'}
           className="w-full flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white py-2 px-4 rounded">
           <FaLinkedin  />
           Se connecter avec LinkedIn
