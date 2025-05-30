@@ -8,19 +8,22 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;  // ← Import important !
 
 import com.easyapply.entity.User;
+import com.easyapply.service.UserService;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @Tag(name = "Authentication", description = "API d'authentification et gestion des comptes")
 public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+    @Autowired
+    private UserService userService;
     @PostMapping("/register")
     @Operation(summary = "Inscription d'un nouvel utilisateur", 
                description = "Créer un nouveau compte utilisateur sur EasyApply")
@@ -36,15 +39,21 @@ public class AuthController {
                 return ResponseEntity.badRequest()
                     .body(Map.of("error", "Mot de passe doit contenir au moins 6 caractères"));
             }
+            if (request.getFirstName() == null || request.getFirstName().isEmpty()) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("error", "Prénom est requis"));
+        }
+        if (request.getLastName() == null || request.getLastName().isEmpty()) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("error", "Nom est requis"));
+        }
 
             // Créer un utilisateur (simulation - pas encore de base de données)
-            User user = new User();
-            user.setEmail(request.getEmail());
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.setFirstName(request.getFirstName());
-            user.setLastName(request.getLastName());
-            user.setRole(User.Role.CANDIDATE);
-            user.setIsActive(true);
+            User user =userService.createUser(
+                request.getEmail(),
+             request.getPassword(), 
+             request.getFirstName(), 
+             request.getLastName());
 
             // Réponse de succès
             Map<String, Object> response = new HashMap<>();
@@ -56,12 +65,17 @@ public class AuthController {
                 "role", user.getRole()
             ));
 
+           
+            
             return ResponseEntity.ok(response);
 
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                .body(Map.of("error", "Erreur lors de l'inscription: " + e.getMessage()));
-        }
+        } catch (RuntimeException e) {
+        return ResponseEntity.badRequest()
+            .body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+        return ResponseEntity.internalServerError()
+            .body(Map.of("error", "Erreur lors de l'inscription: " + e.getMessage()));
+    }
     }
 
     @PostMapping("/login")

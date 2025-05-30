@@ -5,23 +5,19 @@ import Button from '../ui/Button';
 import PasswordInput from '../ui/PasswordInput';
 
 interface RegisterFormProps {
-  onSubmit: (data: {
-    name: string;
-    email: string;
-    password: string;
-    type: 'candidate' | 'company';
-  }) => void;
+  onSubmit?: (data: any) => void;
 }
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
-    type: 'candidate' as 'candidate' | 'company',
+    role: 'CANDIDATE' as 'CANDIDATE' | 'COMPANY',
   });
-  
+
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -30,8 +26,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
       ...prev,
       [name]: value,
     }));
-    
-    // Clear error when field is changed
+
     if (errors[name]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -43,38 +38,44 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
-    if (!formData.name.trim()) {
-      newErrors.name = "Le nom est requis";
+
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = "Le prénom est requis";
     }
-    
+
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = "Le nom est requis";
+    }
+
     if (!formData.email) {
       newErrors.email = "L'email est requis";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "L'email est invalide";
     }
-    
+
     if (!formData.password) {
       newErrors.password = "Le mot de passe est requis";
     } else if (formData.password.length < 8) {
       newErrors.password = "Le mot de passe doit contenir au moins 8 caractères";
     }
-    
+
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Les mots de passe ne correspondent pas";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
       const { confirmPassword, ...submitData } = formData;
+
       try {
         const response = await fetch('http://localhost:8081/api/auth/register', {
+           mode: 'no-cors',
           method: 'POST',
           headers: {
             'Content-type': 'application/json',
@@ -82,14 +83,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
           body: JSON.stringify(submitData),
         });
 
+        const result = await response.json();
+
         if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Erreur serveur :", errorData);
-          alert("Erreur lors de l'inscription : " + (errorData.message || "Vérifiez les champs."));
+          console.error("Erreur serveur :", result);
+          alert("Erreur lors de l'inscription : " + (result.error || "Vérifiez les champs."));
         } else {
-          const result = await response.json();
           console.log("Inscription réussie :", result);
           alert("Inscription réussie !");
+          if (onSubmit) onSubmit(result);
         }
       } catch (error) {
         console.error("Erreur réseau :", error);
@@ -106,20 +108,32 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
           Rejoignez EasyApply pour accéder à des offres d'emploi adaptées à votre profil
         </p>
       </div>
-      
+
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         <Input
-          label="Nom complet"
-          id="name"
-          name="name"
+          label="Prénom"
+          id="firstName"
+          name="firstName"
           type="text"
-          value={formData.name}
+          value={formData.firstName}
           onChange={handleChange}
-          placeholder="safae"
-          error={errors.name}
-          autoComplete="name"
+          placeholder="Safae"
+          error={errors.firstName}
+          autoComplete="given-name"
         />
-        
+
+        <Input
+          label="Nom"
+          id="lastName"
+          name="lastName"
+          type="text"
+          value={formData.lastName}
+          onChange={handleChange}
+          placeholder="Ben Ali"
+          error={errors.lastName}
+          autoComplete="family-name"
+        />
+
         <Input
           label="Email"
           id="email"
@@ -131,7 +145,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
           error={errors.email}
           autoComplete="email"
         />
-        
+
         <PasswordInput
           label="Mot de passe"
           id="password"
@@ -142,7 +156,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
           helper="8 caractères minimum"
           autoComplete="new-password"
         />
-        
+
         <PasswordInput
           label="Confirmer le mot de passe"
           id="confirmPassword"
@@ -152,18 +166,16 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
           error={errors.confirmPassword}
           autoComplete="new-password"
         />
-        
+
         <div className="input-group">
-          <label htmlFor="type" className="label">
-            type de compte
-          </label>
+          <label htmlFor="role" className="label">Type de compte</label>
           <div className="flex space-x-4 mt-1">
             <label className="flex items-center">
               <input
                 type="radio"
-                name="type"
-                value="candidate"
-                checked={formData.type === 'candidate'}
+                name="role"
+                value="CANDIDATE"
+                checked={formData.role === 'CANDIDATE'}
                 onChange={handleChange}
                 className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
               />
@@ -172,9 +184,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
             <label className="flex items-center">
               <input
                 type="radio"
-                name="type"
-                value="company"
-                checked={formData.type === 'company'}
+                name="role"
+                value="COMPANY"
+                checked={formData.role === 'COMPANY'}
                 onChange={handleChange}
                 className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
               />
@@ -182,7 +194,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
             </label>
           </div>
         </div>
-        
+
         <div className="flex items-center">
           <input
             id="terms"
@@ -195,19 +207,18 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
             J'accepte les{' '}
             <Link to="/terms" className="font-medium text-primary-600 hover:text-primary-500">
               conditions d'utilisation
-            </Link>{' '}
-            et la{' '}
+            </Link>{' '}et la{' '}
             <Link to="/privacy" className="font-medium text-primary-600 hover:text-primary-500">
               politique de confidentialité
             </Link>
           </label>
         </div>
-        
+
         <Button type="submit" fullWidth>
           S'inscrire
         </Button>
       </form>
-      
+
       <div className="text-center mt-4">
         <p className="text-sm text-gray-600">
           Vous avez déjà un compte ?{' '}
