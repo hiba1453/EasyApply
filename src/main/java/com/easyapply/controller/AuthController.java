@@ -32,6 +32,8 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/register")
     @Operation(summary = "Inscription d'un nouvel utilisateur", 
@@ -58,28 +60,29 @@ public class AuthController {
         }
 
             // Créer un utilisateur (simulation - pas encore de base de données)
-            User user = new User();
-            user.setEmail(request.getEmail());
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.setFirstName(request.getFirstName());
-            user.setLastName(request.getLastName());
-            user.setRole(User.Role.CANDIDATE);
-            user.setIsActive(true);
+           User user =userService.createUser(
+                request.getEmail(),
+             request.getPassword(), 
+             request.getFirstName(), 
+             request.getLastName());
 
-            // Réponse de succès avec données réelles
-            return ResponseEntity.ok(Map.of(
-                "message", "Inscription réussie !",
-                "user", Map.of(
-                    "id", user.getId(),
-                    "email", user.getEmail(),
-                    "firstName", user.getFirstName(),
-                    "lastName", user.getLastName(),
-                    "role", user.getRole(),
-                    "createdAt", user.getCreatedAt()
-                )
+            // Réponse de succès
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Inscription réussie !");
+            response.put("user", Map.of(
+                "email", user.getEmail(),
+                "firstName", user.getFirstName(),
+                "lastName", user.getLastName(),
+                "role", user.getRole()
             ));
 
-          
+            
+            return ResponseEntity.ok(response);
+
+             } catch (RuntimeException e) {
+        return ResponseEntity.badRequest()
+            .body(Map.of("error", e.getMessage()));
+   
 
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
@@ -99,8 +102,8 @@ public class AuthController {
             }
 
             // ✅ UTILISER LE SERVICE RÉEL POUR L'AUTHENTIFICATION
-            var authResult = authService.authenticateUser(request.getEmail(), request.getPassword());
-            
+            AuthService authService = new AuthService();
+            Map<String, Object> authResult = authService.authenticateUser(request.getEmail(), request.getPassword());
             return ResponseEntity.ok(Map.of(
                 "message", "Connexion réussie !",
                 "token", authResult.get("token"),
