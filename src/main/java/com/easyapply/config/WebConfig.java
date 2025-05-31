@@ -11,15 +11,13 @@ public class WebConfig {
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
-            public void addCorsMappings(org.springframework.web.servlet.config.annotation.CorsRegistry registry) {
-                registry.addMapping("/**") // Apply to all endpoints
-                        .allowedOrigins("http://localhost:5173") // Your frontend origin
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allowed HTTP methods
-                        .allowedHeaders("*") // Allow all headers
-                        .allowCredentials(true); // Allow cookies, auth headers if needed
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:5173")
+                        .allowedMethods("*")
+                        .allowedHeaders("*");
             }
         };
     }
-    
-    }
+}
 

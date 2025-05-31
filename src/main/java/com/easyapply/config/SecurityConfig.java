@@ -26,21 +26,13 @@ public class SecurityConfig {
          http
             .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless API
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/oauth2/**").permitAll() // Allow auth and OAuth2 endpoints
-                .anyRequest().authenticated() // Require authentication for other endpoints
+                .anyRequest().permitAll()
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stateless for JWT
             )
-            .oauth2Login(oauth2 -> oauth2
-                .userInfoEndpoint(userInfo -> userInfo
-                    .userService(oauth2UserService()) // Custom OAuth2 user service
-                )
-                .successHandler((request, response, authentication) -> {
-                    // Redirect or handle success (e.g., generate JWT)
-                    response.sendRedirect("/api/auth/oauth2/success");
-                })
-            );
+           
+               ;
 
         return http.build();
     }

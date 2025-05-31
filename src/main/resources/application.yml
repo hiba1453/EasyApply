@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8090
 
 spring:
   application:
@@ -15,7 +15,7 @@ spring:
   # Configuration JPA/Hibernate
   jpa:
     hibernate:
-      ddl-auto: create-drop  # create-drop pour dev, update pour prod
+      ddl-auto: update  # create-drop pour dev, update pour prod
     show-sql: true  # Afficher les requêtes SQL dans les logs
     properties:
       hibernate:
@@ -23,22 +23,7 @@ spring:
         format_sql: true
   
   # Configuration OAuth2 LinkedIn
-  security:
-    oauth2:
-      client:
-        registration:
-          linkedin:
-            client-id: ${LINKEDIN_CLIENT_ID:78mgyh8hsww222}
-            client-secret: ${LINKEDIN_CLIENT_SECRET:WPL_AP1.gPa70EQui0DWJldW.PjmsYg==}
-            scope: r_liteprofile,r_emailaddress
-            authorization-grant-type: authorization_code
-            redirect-uri: http://localhost:8081/login/oauth2/code/linkedin
-        provider:
-          linkedin:
-            authorization-uri: "https://www.linkedin.com/oauth/v2/authorization"
-            token-uri: "https://www.linkedin.com/oauth/v2/accessToken"
-            user-info-uri: https://api.linkedin.com/v2/me
-            user-name-attribute: id
+  
   
   # Configuration upload de fichiers
   servlet:
