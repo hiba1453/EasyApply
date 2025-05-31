@@ -1,4 +1,6 @@
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +20,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;  // ← Import important !
 
 import com.easyapply.entity.*;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 
@@ -33,59 +32,55 @@ public class AuthController {
     private UserService userService;
     @Autowired
     private AuthService authService;
+    @Autowired
+    private CandidatRepository candidatRepository; // Assure-toi que ce repository existe
 
     @PostMapping("/register")
-    @Operation(summary = "Inscription d'un nouvel utilisateur", 
-               description = "Créer un nouveau compte utilisateur sur EasyApply")
+    @Operation(summary = "Inscription d'un nouvel utilisateur", description = "Créer un nouveau compte utilisateur sur EasyApply")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
             // Validation
             if (request.getEmail() == null || request.getEmail().isEmpty()) {
-                return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Email est requis"));
+                return ResponseEntity.badRequest().body(Map.of("error", "Email est requis"));
             }
-            
-            if (request.getPassword() == null || request.getPassword().length() < 6) {
-                return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Mot de passe doit contenir au moins 6 caractères"));
+            if (request.getMotDePasse() == null || request.getMotDePasse().length() < 8) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Le mot de passe doit contenir au moins 8 caractères"));
             }
-            if (request.getFirstName() == null || request.getFirstName().isEmpty()) {
-            return ResponseEntity.badRequest()
-                .body(Map.of("error", "Prénom est requis"));
-        }
-        if (request.getLastName() == null || request.getLastName().isEmpty()) {
-            return ResponseEntity.badRequest()
-                .body(Map.of("error", "Nom est requis"));
-        }
+            if (!request.getMotDePasse().equals(request.getConfirmedMotDePasse())) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Les mots de passe ne correspondent pas"));
+            }
+            if (request.getNom() == null || request.getNom().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Le nom est requis"));
+            }
+            if (request.getTelephone() == null || request.getTelephone().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Le téléphone est requis"));
+            }
+            if (request.getDateNaissance() == null || request.getDateNaissance().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "La date de naissance est requise"));
+            }
 
-            // Créer un utilisateur (simulation - pas encore de base de données)
-           User user =userService.createUser(
-                request.getEmail(),
-             request.getPassword(), 
-             request.getFirstName(), 
-             request.getLastName());
+            // Parse dateNaissance
+            LocalDate dateNaissance;
+            try {
+                dateNaissance = LocalDate.parse(request.getDateNaissance());
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Format de date de naissance invalide (attendu: YYYY-MM-DD)"));
+            }
 
-            // Réponse de succès
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Inscription réussie !");
-            response.put("user", Map.of(
-                "email", user.getEmail(),
-                "firstName", user.getFirstName(),
-                "lastName", user.getLastName(),
-                "role", user.getRole()
-            ));
+            // Créer et sauvegarder le candidat
+            Candidat candidat = new Candidat();
+            candidat.setNom(request.getNom());
+            candidat.setEmail(request.getEmail());
+            candidat.setMotDePasse(passwordEncoder.encode(request.getMotDePasse()));
+            candidat.setTelephone(request.getTelephone());
+            candidat.setDateNaissance(dateNaissance);
 
-            
-            return ResponseEntity.ok(response);
+            candidatRepository.save(candidat); // <-- Sauvegarde ici
 
-             } catch (RuntimeException e) {
-        return ResponseEntity.badRequest()
-            .body(Map.of("error", e.getMessage()));
-   
+            return ResponseEntity.ok(Map.of("message", "Inscription réussie !"));
 
         } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                .body(Map.of("error", "Erreur lors de l'inscription: " + e.getMessage()));
+            return ResponseEntity.internalServerError().body(Map.of("error", "Erreur lors de l'inscription: " + e.getMessage()));
         }
     }
 
