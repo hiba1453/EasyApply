@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.easyapply.service.AuthService;
-import com.easyapply.service.UserService;
+
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;  // ← Import important !
@@ -28,10 +27,7 @@ import com.easyapply.entity.*;
 public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private AuthService authService;
+  
     @Autowired
     private CandidatRepository candidatRepository; // Assure-toi que ce repository existe
 
@@ -84,37 +80,5 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/login")
-    @Operation(summary = "Connexion utilisateur", 
-               description = "Se connecter avec email et mot de passe")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        try {
-            // Validation
-            if (request.getEmail() == null || request.getPassword() == null) {
-                return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Email et mot de passe requis"));
-            }if (request.getPassword() == null || request.getPassword().isEmpty()) {
-                return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Mot de passe est requis"));
-            }
-
-            // ✅ UTILISER LE SERVICE RÉEL POUR L'AUTHENTIFICATION
-            
-            Map<String, Object> authResult = authService.authenticateUser(request.getEmail(), request.getPassword());
-            return ResponseEntity.ok(Map.of(
-                "message", "Connexion réussie !",
-                "token", authResult.get("token"),
-                "user", authResult.get("user")
-            ));
-
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(401)
-                .body(Map.of("error", e.getMessage()));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError()
-                .body(Map.of("error", "Erreur lors de la connexion: " + e.getMessage()));
-        }
-    }
-
+   
 }
