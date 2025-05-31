@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import Input from '../ui/Input';
-import Button from '../ui/Button';
-import PasswordInput from '../ui/PasswordInput';
+import { Link, useNavigate } from 'react-router-dom';
+import Input from '../../components/ui/Input';
+import PasswordInput from '../../components/ui/PasswordInput';
+import Button from '../../components/ui/Button';
 
 interface RegisterFormProps {
   onSubmit?: (data: any) => void;
@@ -10,17 +10,19 @@ interface RegisterFormProps {
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    nom: '',
     email: '',
-    password: '',
-    confirmPassword: '',
-    role: 'CANDIDATE' as 'CANDIDATE' | 'COMPANY',
+    motDePasse: '',
+    confirmedMotDePasse: '',
+    telephone: '',
+    dateNaissance: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [serverError, setServerError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -34,17 +36,14 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
         return newErrors;
       });
     }
+    setServerError(null);
   };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = "Le prénom est requis";
-    }
-
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = "Le nom est requis";
+    if (!formData.nom.trim()) {
+      newErrors.nom = "Le nom est requis";
     }
 
     if (!formData.email) {
@@ -53,14 +52,22 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
       newErrors.email = "L'email est invalide";
     }
 
-    if (!formData.password) {
-      newErrors.password = "Le mot de passe est requis";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Le mot de passe doit contenir au moins 8 caractères";
+    if (!formData.motDePasse) {
+      newErrors.motDePasse = "Le mot de passe est requis";
+    } else if (formData.motDePasse.length < 8) {
+      newErrors.motDePasse = "Le mot de passe doit contenir au moins 8 caractères";
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Les mots de passe ne correspondent pas";
+    if (formData.motDePasse !== formData.confirmedMotDePasse) {
+      newErrors.confirmedMotDePasse = "Les mots de passe ne correspondent pas";
+    }
+
+    if (!formData.telephone) {
+      newErrors.telephone = "Le téléphone est requis";
+    }
+
+    if (!formData.dateNaissance) {
+      newErrors.dateNaissance = "La date de naissance est requise";
     }
 
     setErrors(newErrors);
@@ -71,11 +78,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
     e.preventDefault();
 
     if (validateForm()) {
-      const { confirmPassword, ...submitData } = formData;
+      // On retire confirmedMotDePasse avant l'envoi
+      const { confirmedMotDePasse, ...submitData } = formData;
 
       try {
-        const response = await fetch('http://localhost:8081/api/auth/register', {
-          
+        const response = await fetch('http://localhost:8090/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -83,22 +90,16 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
           body: JSON.stringify(submitData),
         });
 
-        
+        const result = await response.json();
 
         if (!response.ok) {
-          const errorData = await response.text(); // Use text() to handle non-JSON responses
-          console.error("Erreur serveur :", errorData);
-          alert("Erreur lors de l'inscription : " + (errorData || "Vérifiez les champs."));
-          return;
+          setServerError(result.error || "Erreur lors de l'inscription. Vérifiez les champs.");
         } else {
-          const result = await response.json();
-        console.log("Inscription réussie :", result);
-        alert("Inscription réussie !");
           if (onSubmit) onSubmit(result);
+          navigate('/login');
         }
       } catch (error) {
-        console.error("Erreur réseau :", error);
-        alert("Erreur réseau. Impossible de contacter le serveur.");
+        setServerError("Erreur réseau. Impossible de contacter le serveur.");
       }
     }
   };
@@ -112,29 +113,19 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
         </p>
       </div>
 
+      {serverError && <div className="text-red-500 text-sm text-center">{serverError}</div>}
+
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         <Input
-          label="Prénom"
-          id="firstName"
-          name="firstName"
-          type="text"
-          value={formData.firstName}
-          onChange={handleChange}
-          placeholder="Safae"
-          error={errors.firstName}
-          autoComplete="given-name"
-        />
-
-        <Input
           label="Nom"
-          id="lastName"
-          name="lastName"
+          id="nom"
+          name="nom"
           type="text"
-          value={formData.lastName}
+          value={formData.nom}
           onChange={handleChange}
-          placeholder="Ben Ali"
-          error={errors.lastName}
-          autoComplete="family-name"
+          placeholder="Votre nom"
+          error={errors.nom}
+          autoComplete="name"
         />
 
         <Input
@@ -151,71 +142,47 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
 
         <PasswordInput
           label="Mot de passe"
-          id="password"
-          name="password"
-          value={formData.password}
+          id="motDePasse"
+          name="motDePasse"
+          value={formData.motDePasse}
           onChange={handleChange}
-          error={errors.password}
+          error={errors.motDePasse}
           helper="8 caractères minimum"
           autoComplete="new-password"
         />
 
         <PasswordInput
           label="Confirmer le mot de passe"
-          id="confirmPassword"
-          name="confirmPassword"
-          value={formData.confirmPassword}
+          id="confirmedMotDePasse"
+          name="confirmedMotDePasse"
+          value={formData.confirmedMotDePasse}
           onChange={handleChange}
-          error={errors.confirmPassword}
+          error={errors.confirmedMotDePasse}
           autoComplete="new-password"
         />
 
-        <div className="input-group">
-          <label htmlFor="role" className="label">Type de compte</label>
-          <div className="flex space-x-4 mt-1">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="role"
-                value="CANDIDATE"
-                checked={formData.role === 'CANDIDATE'}
-                onChange={handleChange}
-                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
-              />
-              <span className="ml-2 text-gray-700">Candidat</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="role"
-                value="COMPANY"
-                checked={formData.role === 'COMPANY'}
-                onChange={handleChange}
-                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
-              />
-              <span className="ml-2 text-gray-700">Entreprise</span>
-            </label>
-          </div>
-        </div>
+        <Input
+          label="Téléphone"
+          id="telephone"
+          name="telephone"
+          type="tel"
+          value={formData.telephone}
+          onChange={handleChange}
+          placeholder="06 12 34 56 78"
+          error={errors.telephone}
+          autoComplete="tel"
+        />
 
-        <div className="flex items-center">
-          <input
-            id="terms"
-            name="terms"
-            type="checkbox"
-            className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-            required
-          />
-          <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
-            J'accepte les{' '}
-            <Link to="/terms" className="font-medium text-primary-600 hover:text-primary-500">
-              conditions d'utilisation
-            </Link>{' '}et la{' '}
-            <Link to="/privacy" className="font-medium text-primary-600 hover:text-primary-500">
-              politique de confidentialité
-            </Link>
-          </label>
-        </div>
+        <Input
+          label="Date de naissance"
+          id="dateNaissance"
+          name="dateNaissance"
+          type="date"
+          value={formData.dateNaissance}
+          onChange={handleChange}
+          error={errors.dateNaissance}
+          autoComplete="bday"
+        />
 
         <Button type="submit" fullWidth>
           S'inscrire
