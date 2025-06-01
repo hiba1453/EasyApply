@@ -5,7 +5,6 @@ import Input from '../ui/Input';
 import Button from '../ui/Button';
 import PasswordInput from '../ui/PasswordInput';
 
-
 // Update the interface
 interface LoginFormProps {
   onSubmit: (data: { email: string; motDePasse: string; token: string; user: any }) => void;

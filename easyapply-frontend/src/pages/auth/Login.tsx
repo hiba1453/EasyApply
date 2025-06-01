@@ -19,13 +19,24 @@ const Login: React.FC = () => {
         }),
         credentials: 'include',
       });
+      console.log("Sending login request with data:", {
+        email: data.email,
+        motDePasse: data.motDePasse,
+      });
+      // Check if the response is ok
+      console.error("Response status:", response);
 
       const result = await response.json();
+
+      console.log("Login response:", result);
 
       if (response.ok) {
         // Store token and role
         localStorage.setItem('token', result.token);
         localStorage.setItem('role', result.role);
+        
+        console.log("Login successful:", result.role);
+
 
         // Redirect based on role
         switch(result.role) {
@@ -109,4 +120,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default LoginForm;
+export default Login;
