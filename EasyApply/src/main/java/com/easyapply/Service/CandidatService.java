@@ -6,11 +6,17 @@ import com.easyapply.Repository.CandidatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.easyapply.DTO.LoginRequest;
+import com.easyapply.Service.JwtService;
+import java.util.HashMap;
+import java.util.*;
 
 import java.time.LocalDate;
 
 @Service
 public class CandidatService {
+    @Autowired
+    private JwtService jwtService;
 
     @Autowired
     private CandidatRepository candidatRepository;
@@ -31,4 +37,37 @@ public class CandidatService {
 
         return candidatRepository.save(candidat);
     }
+
+    public Optional<Candidat> findByEmail(String email) {
+        return candidatRepository.findByEmail(email);
+    }
+    public boolean existsByEmail(String email) {
+        return candidatRepository.existsByEmail(email);
+    }
+    public Candidat findById(Long id) {
+        return candidatRepository.findById(id).orElse(null);
+    }
+   
+       // Service pour gérer les tokens
+
+    public String login(LoginRequest request) {
+        // Recherche le candidat
+        Candidat candidat = candidatRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Email ou mot de passe incorrect"));
+            
+
+        // Vérifie le mot de passe
+        if (!passwordEncoder.matches(request.getMotDePasse(), candidat.getMotDePasse())) {
+            throw new RuntimeException("Email ou mot de passe incorrect");
+        }
+
+        // Génère le token JWT
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", candidat.getId());
+        claims.put("email", candidat.getEmail());
+        claims.put("role", "CANDIDAT");
+
+        return jwtService.generateToken(claims, candidat.getEmail());
+    }
+
 }

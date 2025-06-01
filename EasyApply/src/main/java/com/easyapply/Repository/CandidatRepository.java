@@ -1,11 +1,17 @@
 package com.easyapply.Repository;
 
 import com.easyapply.entity.Candidat;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CandidatRepository extends JpaRepository<Candidat, Long> {
-    Candidat findByEmail(String email); // <-- Add this method
+    Optional<Candidat> findByEmail(String email);
+    Optional<Candidat> findById(Long id);
+    boolean existsByEmail(String email);
+    
+    
+     // <-- Add this method
 
 
 

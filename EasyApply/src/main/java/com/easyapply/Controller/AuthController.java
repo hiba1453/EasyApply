@@ -14,7 +14,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.easyapply.Repository.*;
-import com.easyapply.DTO.RegisterRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.easyapply.Repository.CandidatRepository;
+
+import com.easyapply.entity.Candidat;
+import com.easyapply.entity.Entreprise;
+
+import com.easyapply.DTO.*;
 import com.easyapply.Repository.CandidatRepository;
 import com.easyapply.entity.Candidat;
 
@@ -38,6 +47,8 @@ public class AuthController {
    
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private AuthService authService; // Assure-toi que ce service existe
   
     @Autowired
     private CandidatRepository candidatRepository; // Assure-toi que ce repository existe
@@ -116,6 +127,29 @@ public ResponseEntity<?> registerCompany(@RequestBody RegisterCRequest request) 
         return ResponseEntity.internalServerError().body(Map.of("error", "Erreur lors de l'inscription: " + e.getMessage()));
     }
 }
+    
+    @PostMapping("/login")
+    @Operation(summary = "Connexion d'un utilisateur", description = "Authentifier un utilisateur sur EasyApply")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            // Validation
+            if (request.getEmail() == null || request.getEmail().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Email est requis"));
+            }
+            if (request.getMotDePasse() == null || request.getMotDePasse().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Mot de passe est requis"));
+            }
+
+            // Authentification via le service
+            LoginResponse response = authService.authenticate(request);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                .body(Map.of("error", "Erreur lors de la connexion: " + e.getMessage()));
+        }
+    }
     
 
    
