@@ -6,15 +6,16 @@ import org.springframework.stereotype.Service;
 
 import com.easyapply.Repository.CandidatRepository;
 import com.easyapply.Repository.CompanyRepository;
-import com.easyapply.Repository.AdminRepository;
+import com.easyapply.Repository.*;
 import com.easyapply.DTO.LoginRequest;
 import com.easyapply.entity.Candidat;
 import com.easyapply.entity.Entreprise;
-import com.easyapply.entity.Administrateur;
+import com.easyapply.entity.*;
 import com.easyapply.DTO.LoginResponse;
 import com.easyapply.Service.JwtService;
 import java.util.HashMap;
 import java.util.Map;
+import jakarta.servlet.http.HttpSession;
 
 
 @Service
@@ -27,6 +28,10 @@ public class AuthService {
     
     @Autowired
     private AdminRepository adminRepository;
+   
+     @Autowired
+    private HttpSession httpSession; // Add this line
+
     
     @Autowired
     private JwtService jwtService;
@@ -63,7 +68,27 @@ public class AuthService {
         claims.put("role", role);
         
         String token = jwtService.generateToken(claims, email);
+        httpSession.setAttribute("USER_ID", id);
+        httpSession.setAttribute("USER_ROLE", role);
+        httpSession.setAttribute("USER_EMAIL", email);
         
         return new LoginResponse(token, role);
+        
     }
+   
+    // Add method to check session
+    public boolean isAuthenticated() {
+        return httpSession.getAttribute("USER_ID") != null;
+    }
+
+    // Add method to get current user ID
+    public Long getCurrentUserId() {
+        return (Long) httpSession.getAttribute("USER_ID");
+    }
+
+    // Add method to get current user role
+    public String getCurrentUserRole() {
+        return (String) httpSession.getAttribute("USER_ROLE");
+    }
+    
 }

@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -56,7 +56,9 @@ public class AuthController {
     @Autowired
     private CandidatService candidatService;
     @Autowired
-    private EntrepriseService entrepriseService; // Assure-toi que ce service existe
+    private EntrepriseService entrepriseService;
+     @Autowired
+    private OffreEmploiService offreEmploiService; // Assure-toi que ce service existe
 
     @PostMapping("/register")
     @Operation(summary = "Inscription d'un nouvel utilisateur", description = "Créer un nouveau compte utilisateur sur EasyApply")
@@ -151,6 +153,22 @@ public ResponseEntity<?> registerCompany(@RequestBody RegisterCRequest request) 
         }
     }
     
+    @GetMapping("/offres")
+    @Operation(summary = "Récupérer les offres d'emploi", description = "Obtenir la liste des offres d'emploi disponibles")
+    public ResponseEntity<?> getAllOffres(){
+           return ResponseEntity.ok(offreEmploiService.getAllOffres());
+    }
+
+    @GetMapping("/offres/{id}")
+    public ResponseEntity<?> getOffreById(@PathVariable Long id) {
+        try {
+            OffreEmploiResponse offre = offreEmploiService.getOffreById(id);
+            return ResponseEntity.ok(offre);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 
    
 }
