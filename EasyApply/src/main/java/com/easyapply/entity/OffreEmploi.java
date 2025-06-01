@@ -1,6 +1,5 @@
 package com.easyapply.entity;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.*;
 
 import jakarta.persistence.*;
@@ -40,5 +39,107 @@ public class OffreEmploi {
     @OneToMany(mappedBy = "offre", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Recommandation> recommandations = new ArrayList<>();
     
-    // Getters, setters, constructeurs...
+    public Long getId() {
+    return id;
+}
+
+public void setId(Long id) {
+    this.id = id;
+}
+
+public String getTitre() {
+    return titre;
+}
+
+public void setTitre(String titre) {
+    this.titre = titre;
+}
+
+public String getDescription() {
+    return description;
+}
+
+public void setDescription(String description) {
+    this.description = description;
+}
+
+public String getMotsCles() {
+    return motsCles;
+}
+
+public void setMotsCles(String motsCles) {
+    this.motsCles = motsCles;
+}
+
+public LocalDateTime getDatePublication() {
+    return datePublication;
+}
+
+public void setDatePublication(LocalDateTime datePublication) {
+    this.datePublication = datePublication;
+}
+
+public LocalDateTime getDateExpiration() {
+    return dateExpiration;
+}
+
+public void setDateExpiration(LocalDateTime dateExpiration) {
+    this.dateExpiration = dateExpiration;
+}
+
+public String getLieu() {
+    return lieu;
+}
+
+public void setLieu(String lieu) {
+    this.lieu = lieu;
+}
+
+public String getSalaire() {
+    return salaire;
+}
+
+public void setSalaire(String salaire) {
+    this.salaire = salaire;
+}
+
+public String getTypeContrat() {
+    return typeContrat;
+}
+
+public void setTypeContrat(String typeContrat) {
+    this.typeContrat = typeContrat;
+}
+
+public String getNiveauExperience() {
+    return niveauExperience;
+}
+
+public void setNiveauExperience(String niveauExperience) {
+    this.niveauExperience = niveauExperience;
+}
+
+public Entreprise getEntreprise() {
+    return entreprise;
+}
+
+public void setEntreprise(Entreprise entreprise) {
+    this.entreprise = entreprise;
+}
+
+public List<Candidature> getCandidatures() {
+    return candidatures;
+}
+
+public void setCandidatures(List<Candidature> candidatures) {
+    this.candidatures = candidatures;
+}
+
+public List<Recommandation> getRecommandations() {
+    return recommandations;
+}
+
+public void setRecommandations(List<Recommandation> recommandations) {
+    this.recommandations = recommandations;
+}
 }
