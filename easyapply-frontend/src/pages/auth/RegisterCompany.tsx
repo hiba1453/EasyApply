@@ -9,7 +9,7 @@ const RegisterCompany: React.FC = () => {
   const handleRegister = async (data: any) => {
   try {
     // ✅ Envoi au backend
-    const response = await fetch('http://localhost:8090/easyapply/api/entreprises', {
+    const response = await fetch('http://localhost:8090/register/company', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),

@@ -1,3 +1,6 @@
+package com.easyapply.DTO;
+
+
 public class RegisterRequest {
     private String nom;
     private String email;

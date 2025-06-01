@@ -119,7 +119,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
   return (
     <div className="max-w-md w-full space-y-6">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900">Créer un compte</h2>
+        <h2 className="text-3xl font-bold text-gray-900">Créer un compte Candidat</h2>
         <p className="mt-2 text-gray-600">
           Rejoignez EasyApply pour accéder à des offres d'emploi adaptées à votre profil
         </p>
@@ -228,6 +228,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
           </Link>
         </p>
       </div>
+      <div className="text-center mt-4">
+        <p className="text-sm text-gray-600">
+          Vous etes une entreprise ?{' '}
+          <Link to="/register/company" className="font-medium text-primary-600 hover:text-primary-500">
+            S'inscrire comme entreprise
+          </Link>
+        </p>
+      </div>
+      
     </div>
   );
 };

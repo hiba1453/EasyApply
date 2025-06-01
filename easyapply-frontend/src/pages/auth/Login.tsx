@@ -6,10 +6,32 @@ import LoginForm from '../../components/auth/LoginForm';
 const Login: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleLogin = (data: { email: string; password: string }) => {
-    console.log('Login data:', data);
-    // For demo purposes, we'll navigate to the candidate dashboard
-    navigate('/dashboard/candidate/jobs');
+  const handleSubmit = async (data: { email: string; password: string; token: string; user: any }) => {
+    try {
+      const response = await fetch('http://localhost:8090/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+        credentials: 'include', // if you want to send cookies
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Success: redirect or show success message
+        navigate('/dashboard/candidate/jobs');
+      } else {
+        // Error: show error message
+        alert(result.error || "Erreur lors de la connexion");
+      }
+    } catch (error) {
+      alert("Erreur réseau");
+    }
   };
 
   return (
@@ -24,7 +46,7 @@ const Login: React.FC = () => {
             </Link>
           </div>
           
-          <LoginForm onSubmit={handleLogin} />
+          <LoginForm onSubmit={handleSubmit} />
         </div>
       </div>
       
@@ -71,4 +93,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default LoginForm;

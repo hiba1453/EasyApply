@@ -55,7 +55,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
 
     if (validateForm()) {
       try {
-        const response = await fetch('http://localhost:8081/api/auth/login', {
+        const response = await fetch('http://localhost:8090/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -141,7 +141,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
       {/* Bouton LinkedIn */}
       <div className="mt-6">
         <button
-          onClick={() => window.location.href = 'http://localhost:8081/oauth2/authorization/linkedin'}
+          onClick={() => window.location.href = 'http://localhost:8090/login'}
           className="w-full flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white py-2 px-4 rounded">
           <FaLinkedin  />
           Se connecter avec LinkedIn

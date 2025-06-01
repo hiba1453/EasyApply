@@ -2,6 +2,7 @@ package com.easyapply.Controller;
 
 
 import java.time.LocalDate;
+
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,17 +25,27 @@ import com.easyapply.entity.*;
 import com.easyapply.DTO.*; // Assure-toi que ce DTO existe
 import io.swagger.v3.oas.annotations.Operation;  // ← Import important !
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.easyapply.Service.*;
+import com.easyapply.Repository.*;
+import com.easyapply.DTO.RegisterCRequest;
 
 @RestController
 
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @Tag(name = "Authentication", description = "API d'authentification et gestion des comptes")
 public class AuthController {
+  
+   
     @Autowired
     private PasswordEncoder passwordEncoder;
   
     @Autowired
     private CandidatRepository candidatRepository; // Assure-toi que ce repository existe
+
+    @Autowired
+    private CandidatService candidatService;
+    @Autowired
+    private EntrepriseService entrepriseService; // Assure-toi que ce service existe
 
     @PostMapping("/register")
     @Operation(summary = "Inscription d'un nouvel utilisateur", description = "Créer un nouveau compte utilisateur sur EasyApply")
@@ -68,15 +79,8 @@ public class AuthController {
                 return ResponseEntity.badRequest().body(Map.of("error", "Format de date de naissance invalide (attendu: YYYY-MM-DD)"));
             }
 
-            // Créer et sauvegarder le candidat
-            Candidat candidat = new Candidat();
-            candidat.setNom(request.getNom());
-            candidat.setEmail(request.getEmail());
-            candidat.setMotDePasse(passwordEncoder.encode(request.getMotDePasse()));
-            candidat.setTelephone(request.getTelephone());
-            candidat.setDateNaissance(dateNaissance);
-
-            candidatRepository.save(candidat); // <-- Sauvegarde ici
+            // Utilise le service pour enregistrer le candidat
+            candidatService.registerCandidat(request);
 
             return ResponseEntity.ok(Map.of("message", "Inscription réussie !"));
 
@@ -84,6 +88,35 @@ public class AuthController {
             return ResponseEntity.internalServerError().body(Map.of("error", "Erreur lors de l'inscription: " + e.getMessage()));
         }
     }
+    
+    
+
+@PostMapping("/register/company")
+@Operation(summary = "Inscription d'une entreprise", description = "Créer un nouveau compte entreprise sur EasyApply")
+public ResponseEntity<?> registerCompany(@RequestBody RegisterCRequest request) {
+    try {
+        // Validation
+        if (request.getEmail() == null || request.getEmail().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Email est requis"));
+        }
+        if (request.getMotDePasse() == null || request.getMotDePasse().length() < 8) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Le mot de passe doit contenir au moins 8 caractères"));
+        }
+        if (request.getNom() == null || request.getNom().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Le nom de l'entreprise est requis"));
+        }
+        if (request.getSecteur() == null || request.getSecteur().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Le secteur d'activité est requis"));
+        }
+
+        entrepriseService.registerEntreprise(request);
+
+        return ResponseEntity.ok(Map.of("message", "Inscription entreprise réussie !"));
+    } catch (Exception e) {
+        return ResponseEntity.internalServerError().body(Map.of("error", "Erreur lors de l'inscription: " + e.getMessage()));
+    }
+}
+    
 
    
 }

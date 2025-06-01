@@ -74,7 +74,7 @@ const RegisterCompanyForm: React.FC<RegisterCompanyFormProps> = ({ onSubmit }) =
       const { confirmPassword, ...submitData } = formData;
 
       try {
-        const response = await fetch('http://localhost:8090/easyapply/api/auth/register/company', {
+        const response = await fetch('http://localhost:8090/register/company', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
