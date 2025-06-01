@@ -67,7 +67,7 @@ const JobForm: React.FC<JobFormProps> = ({ onSubmit, initialValues = {} }) => {
       // Process tags string into array
       const processedData = {
         ...formData,
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+        tags: formData.tags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag)
       };
       
       onSubmit(processedData);

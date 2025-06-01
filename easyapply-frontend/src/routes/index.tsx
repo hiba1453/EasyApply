@@ -20,7 +20,7 @@ const Router: React.FC = () => {
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Login onSubmit={(data) => { /* handle login submission here */ }} />} />
         <Route path="/register" element={<Register />} />
         
         {/* Candidate dashboard routes */}
