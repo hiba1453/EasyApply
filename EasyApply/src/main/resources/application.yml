@@ -21,6 +21,12 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+
+    session:
+      store-type: jdbc
+      timeout: 30m
+      jdbc:
+       initialize-schema: always
   
   # Configuration OAuth2 LinkedIn
   

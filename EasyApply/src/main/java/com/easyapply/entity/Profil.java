@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.util.List;
 import java.util.ArrayList;
 
+
 @Entity
 @Table(name = "profil")
 public class Profil {
@@ -33,6 +34,11 @@ public class Profil {
     public Profil() {
     }
 
+    // Since email is in Candidat entity, we need to access it through candidat
+    public String getEmail() {
+        return candidat != null ? candidat.getEmail() : null;
+    }
+
     // Getters and Setters
     public Long getId() {
         return id;
@@ -48,38 +54,6 @@ public class Profil {
 
     public void setTitreProfessionnel(String titreProfessionnel) {
         this.titreProfessionnel = titreProfessionnel;
-    }
-
-    public List<Competence> getCompetences() {
-        return competences;
-    }
-
-    public void setCompetences(List<Competence> competences) {
-        this.competences = competences;
-    }
-
-    public List<Experience> getExperiences() {
-        return experiences;
-    }
-
-    public void setExperiences(List<Experience> experiences) {
-        this.experiences = experiences;
-    }
-
-    public List<Formation> getFormations() {
-        return formations;
-    }
-
-    public void setFormations(List<Formation> formations) {
-        this.formations = formations;
-    }
-
-    public List<Langue> getLangues() {
-        return langues;
-    }
-
-    public void setLangues(List<Langue> langues) {
-        this.langues = langues;
     }
 
     public Candidat getCandidat() {
