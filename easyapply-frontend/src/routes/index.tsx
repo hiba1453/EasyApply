@@ -4,12 +4,15 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Landing from '../pages/Landing';
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
-
+import CompanyDashboard from '../pages/dashboard/company/CompanyDashboard';
+import JobForm from '../pages/dashboard/company/JobForm';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import CandidateJobs from '../pages/dashboard/candidate/CandidateJobs';
 import CandidateResume from '../pages/dashboard/candidate/CandidateResume';
 import CandidateApplications from '../pages/dashboard/candidate/CandidateApplications';
-import CompanyJobs from '../pages/dashboard/company/CompanyJobs';
+import CompanyJobs from '../pages/dashboard/company/CompanyDashboard';
+import RegisterCompany from '../pages/auth/RegisterCompany';
+
 
 const Router: React.FC = () => {
   return (
@@ -45,16 +48,20 @@ const Router: React.FC = () => {
             </DashboardLayout>
           } 
         />
+
+        <Route path="/dashboard/company" element={<CompanyDashboard />} />
+        <Route path="/dashboard/company/jobs" element={<CompanyJobs />} />
+        <Route path="/dashboard/company/jobs/create" element={<JobForm />} />
+        <Route path="/dashboard/company/jobs/edit/:id" element={<JobForm />} />
+
+        <Route
+         path="/register/company"
+         element={<RegisterCompany />} />
+
         
-        {/* Company dashboard routes */}
-        <Route 
-          path="/dashboard/company/jobs" 
-          element={
-            <DashboardLayout>
-              <CompanyJobs />
-            </DashboardLayout>
-          } 
-        />
+        
+       
+        
         
         {/* Redirects */}
         <Route path="/dashboard" element={<Navigate to="/dashboard/candidate/jobs\" replace />} />
