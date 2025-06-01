@@ -1,3 +1,4 @@
+package com.easyapply.Repository;
 import com.easyapply.entity.Candidat;
 import org.springframework.data.jpa.repository.JpaRepository;
 

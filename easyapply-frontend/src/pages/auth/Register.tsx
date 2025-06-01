@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import Input from '../../components/ui/Input';
 import PasswordInput from '../../components/ui/PasswordInput';
 import Button from '../../components/ui/Button';
-
 interface RegisterFormProps {
   onSubmit?: (data: any) => void;
 }
@@ -20,7 +19,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // For redirecting after success
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -36,7 +35,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
         return newErrors;
       });
     }
-    setServerError(null);
+    setServerError(null); // Clear server errors on input change
   };
 
   const validateForm = () => {
@@ -63,11 +62,20 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
     }
 
     if (!formData.telephone) {
-      newErrors.telephone = "Le téléphone est requis";
+      newErrors.telephone = "Le numéro de téléphone est requis";
+    } else if (!/^\+?[1-9]\d{9,14}$/.test(formData.telephone)) {
+      newErrors.telephone = "Numéro de téléphone invalide (ex: +33612345678)";
     }
 
     if (!formData.dateNaissance) {
       newErrors.dateNaissance = "La date de naissance est requise";
+    } else {
+      const birthDate = new Date(formData.dateNaissance);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      if (age < 18) {
+        newErrors.dateNaissance = "Vous devez avoir au moins 18 ans";
+      }
     }
 
     setErrors(newErrors);
@@ -78,27 +86,31 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
     e.preventDefault();
 
     if (validateForm()) {
-      // On retire confirmedMotDePasse avant l'envoi
-      const { confirmedMotDePasse, ...submitData } = formData;
+      const submitData = { ...formData }; // Include all fields
+       // Remove confirmed password from submission
 
       try {
-        const response = await fetch('http://localhost:8081/api/auth/register', {
+        const response = await fetch('http://localhost:8090/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(submitData),
+          credentials: 'include', // If backend requires cookies
         });
 
         const result = await response.json();
 
         if (!response.ok) {
+          console.error("Erreur serveur :", result);
           setServerError(result.error || "Erreur lors de l'inscription. Vérifiez les champs.");
         } else {
+          console.log("Inscription réussie :", result);
           if (onSubmit) onSubmit(result);
-          navigate('/login');
+          navigate('/login'); // Redirect to login page on success
         }
       } catch (error) {
+        console.error("Erreur réseau :", error);
         setServerError("Erreur réseau. Impossible de contacter le serveur.");
       }
     }
@@ -123,7 +135,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
           type="text"
           value={formData.nom}
           onChange={handleChange}
-          placeholder="Votre nom"
+          placeholder="Dupont"
           error={errors.nom}
           autoComplete="name"
         />
@@ -168,7 +180,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
           type="tel"
           value={formData.telephone}
           onChange={handleChange}
-          placeholder="06 12 34 56 78"
+          placeholder="+33612345678"
           error={errors.telephone}
           autoComplete="tel"
         />
@@ -183,6 +195,25 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
           error={errors.dateNaissance}
           autoComplete="bday"
         />
+
+        <div className="flex items-center">
+          <input
+            id="terms"
+            name="terms"
+            type="checkbox"
+            className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+            required
+          />
+          <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
+            J'accepte les{' '}
+            <Link to="/terms" className="font-medium text-primary-600 hover:text-primary-500">
+              conditions d'utilisation
+            </Link>{' '}et la{' '}
+            <Link to="/privacy" className="font-medium text-primary-600 hover:text-primary-500">
+              politique de confidentialité
+            </Link>
+          </label>
+        </div>
 
         <Button type="submit" fullWidth>
           S'inscrire

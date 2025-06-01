@@ -1,3 +1,4 @@
+package com.easyapply.Controller;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,12 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
+import com.easyapply.Repository.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;  // ← Import important !
 
 import com.easyapply.entity.*;
+import com.easyapply.DTO.*; // Assure-toi que ce DTO existe
 
 @RestController
 
