@@ -5,14 +5,17 @@ import Input from '../ui/Input';
 import Button from '../ui/Button';
 import PasswordInput from '../ui/PasswordInput';
 
+
+// Update the interface
 interface LoginFormProps {
-  onSubmit: (data: { email: string; password: string; token: string; user: any }) => void;
+  onSubmit: (data: { email: string; motDePasse: string; token: string; user: any }) => void;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
+  // Update state to use motDePasse
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
+    motDePasse: '', // Changed from password
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -42,8 +45,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
       newErrors.email = "L'email est invalide";
     }
 
-    if (!formData.password) {
-      newErrors.password = "Le mot de passe est requis";
+    if (!formData.motDePasse) { // Changed from password
+      newErrors.motDePasse = "Le mot de passe est requis";
     }
 
     setErrors(newErrors);
@@ -105,11 +108,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
 
         <PasswordInput
           label="Mot de passe"
-          id="password"
-          name="password"
-          value={formData.password}
+          id="motDePasse" // Changed from password
+          name="motDePasse" // Changed from password
+          value={formData.motDePasse} // Changed from password
           onChange={handleChange}
-          error={errors.password}
+          error={errors.motDePasse} // Changed from password
           autoComplete="current-password"
         />
 

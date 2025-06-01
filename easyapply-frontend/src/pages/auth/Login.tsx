@@ -6,7 +6,7 @@ import LoginForm from '../../components/auth/LoginForm';
 const Login: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleSubmit = async (data: { email: string; password: string; token: string; user: any }) => {
+  const handleSubmit = async (data: { email: string; motDePasse: string; token: string; user: any }) => {
     try {
       const response = await fetch('http://localhost:8090/login', {
         method: 'POST',
@@ -15,16 +15,32 @@ const Login: React.FC = () => {
         },
         body: JSON.stringify({
           email: data.email,
-          password: data.password,
+          motDePasse: data.motDePasse,  // Use motDePasse from data
         }),
-        credentials: 'include', // if you want to send cookies
+        credentials: 'include',
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        // Success: redirect or show success message
-        navigate('/dashboard/candidate/jobs');
+        // Store token and role
+        localStorage.setItem('token', result.token);
+        localStorage.setItem('role', result.role);
+
+        // Redirect based on role
+        switch(result.role) {
+          case 'ADMIN':
+            navigate('/dashboard/admin');
+            break;
+          case 'CANDIDAT':
+            navigate('/dashboard/candidate/jobs');
+            break;
+          case 'ENTREPRISE':
+            navigate('/dashboard/company');
+            break;
+          default:
+            navigate('/');
+        }
       } else {
         // Error: show error message
         alert(result.error || "Erreur lors de la connexion");

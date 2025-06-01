@@ -15,21 +15,19 @@ const RegisterCompany: React.FC = () => {
       body: JSON.stringify(data),
     });
 
-    if (!response.ok) {
-      throw new Error('Erreur lors de l\'inscription');
-    }
+    
 
     const result = await response.json();
     console.log('Entreprise créée:', result);
     
     // ✅ Redirection après succès
-    navigate('/auth/login', { 
+      navigate('/login', { 
       state: { message: 'Inscription réussie ! Connectez-vous.' }
     });
     
   } catch (error) {
     console.error('Erreur:', error);
-    alert('Erreur lors de l\'inscription');
+    
   }
 };
 
