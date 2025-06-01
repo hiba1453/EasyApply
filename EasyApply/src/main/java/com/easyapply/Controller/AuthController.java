@@ -1,5 +1,6 @@
+package com.easyapply.Controller;
+
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,15 +9,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.easyapply.DTO.RegisterRequest;
+import com.easyapply.Repository.CandidatRepository;
+import com.easyapply.entity.Candidat;
 
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;  // ← Import important !
-
-import com.easyapply.entity.*;
+import io.swagger.v3.oas.annotations.Operation;  // ← Import important !
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 
