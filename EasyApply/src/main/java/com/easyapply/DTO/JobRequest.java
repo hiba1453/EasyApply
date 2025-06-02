@@ -3,15 +3,15 @@ package com.easyapply.DTO;
 import java.time.LocalDateTime;
 
 public class JobRequest {
+    private Long entrepriseId;
     private String titre;
     private String description;
-    private String motsCles;
     private String lieu;
-    private String salaire;
     private String typeContrat;
     private String niveauExperience;
+    private String salaire;
+    private String motsCles;
     private LocalDateTime dateExpiration;
-    private Long entrepriseId;
 
     // Constructeurs
     public JobRequest() {}

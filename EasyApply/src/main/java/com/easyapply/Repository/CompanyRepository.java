@@ -13,10 +13,12 @@ public interface CompanyRepository extends JpaRepository<Entreprise, Long> {
     Optional<Entreprise> findByEmail(String email);
     
     boolean existsByEmail(String email);
+
+    
     
     // JpaRepository fournit automatiquement :
     // - save(Entreprise entreprise)
-    // - findById(Long id) 
+    Optional<Entreprise> findById(Long id) ;
     // - findAll()
     // - deleteById(Long id)
 }

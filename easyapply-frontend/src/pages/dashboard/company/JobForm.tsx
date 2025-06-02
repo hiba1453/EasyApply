@@ -12,8 +12,10 @@ import {
 } from 'lucide-react';
 import Card from '../../../components/ui/Card';
 
+
 interface JobFormData {
   title: string;
+  entrepriseId: string;
   department: string;
   location: string;
   type: string;
@@ -34,6 +36,7 @@ const JobForm: React.FC = () => {
 
   const [formData, setFormData] = useState<JobFormData>({
     title: '',
+    entrepriseId: '', // Now a string
     department: '',
     location: '',
     type: 'CDI',
@@ -63,6 +66,7 @@ const JobForm: React.FC = () => {
     'Finance', 'Support', 'Direction', 'Autre'
   ];
 
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     
@@ -71,6 +75,11 @@ const JobForm: React.FC = () => {
       setFormData(prev => ({
         ...prev,
         [name]: checked
+      }));
+    } else if (name === 'entrepriseId') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
       }));
     } else {
       setFormData(prev => ({
@@ -86,7 +95,7 @@ const JobForm: React.FC = () => {
         [name]: undefined
       }));
     }
-  };
+  }; // Add this closing brace
 
   const validateForm = (): boolean => {
     const newErrors: Partial<JobFormData> = {};
@@ -97,7 +106,17 @@ const JobForm: React.FC = () => {
     if (!formData.description.trim()) newErrors.description = 'La description est requise';
     if (!formData.requirements.trim()) newErrors.requirements = 'Les exigences sont requises';
     if (!formData.deadline) newErrors.deadline = 'La date limite est requise';
-
+    if (!formData.entrepriseId) {
+    newErrors.entrepriseId = "L'ID de l'entreprise est requis";
+  } else if (formData.entrepriseId.trim() === "") {
+    newErrors.entrepriseId = "L'ID de l'entreprise ne peut pas être vide";
+  } else if (isNaN(Number(formData.entrepriseId))) {
+    newErrors.entrepriseId = "L'ID de l'entreprise doit être un nombre valide";
+  } else if (Number(formData.entrepriseId) <= 0) {
+    newErrors.entrepriseId = "L'ID de l'entreprise doit être un nombre positif";
+  } else if (!Number.isInteger(Number(formData.entrepriseId))) {
+    newErrors.entrepriseId = "L'ID de l'entreprise doit être un nombre entier";
+  }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -110,18 +129,63 @@ const JobForm: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // Ici, vous feriez l'appel API pour créer/modifier l'offre
-      console.log('Données à envoyer:', formData);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Veuillez vous connecter pour publier une offre');
+      }
+
+      // Format the date properly
+      const dateExpiration = new Date(formData.deadline).toISOString();
+     
+
+      // Structure the data exactly as the backend expects it
+      const jobData = {
+        entrepriseId: Number(formData.entrepriseId),
+        titre: formData.title,
+        description: formData.description,
+        lieu: formData.location,
+        typeContrat: formData.type,
+        niveauExperience: formData.experience,
+        salaire: formData.salary,
+        motsCles: formData.department,
+        dateExpiration: dateExpiration
+      };
+
+      console.log('Sending job data:', jobData); // Debug log
+
+      const response = await fetch('http://localhost:8090/api/jobs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        credentials: 'include',
+        mode: 'cors',
+        body: JSON.stringify(jobData)
+      });
+      console.log('Response status:', response.status); // Debug log
+      console.log('Response headers:', response.headers.get('Content-Type')); // Debug log
+      // Check if the response is ok (status in the range 200-299)
+
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de la création de l\'offre');
+      }
+
+      await response.json();
+      navigate('/dashboard/company', { replace: true });
       
-      // Simulation d'un délai d'API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Redirection vers la liste des offres
-      navigate('/company/jobs');
-    } catch (error) {
-      console.error('Erreur lors de l\'enregistrement:', error);
+    } catch (error: any) {
+      console.error('Error submitting form:', error);
+      setErrors(prev => ({
+        ...prev,
+        submit: error.message
+      }));
     } finally {
       setIsSubmitting(false);
+
     }
   };
 
@@ -163,6 +227,26 @@ const JobForm: React.FC = () => {
                 Informations générales
               </h3>
               
+              {/* Add this input field for entrepriseId */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  ID de l'entreprise *
+                </label>
+                <input
+                  type="number"
+                  name="entrepriseId"
+                  value={formData.entrepriseId}
+                  onChange={handleInputChange}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors.entrepriseId ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="Ex: 123"
+                />
+                {errors.entrepriseId && (
+                  <p className="text-red-500 text-xs mt-1">{errors.entrepriseId}</p>
+                )}
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">

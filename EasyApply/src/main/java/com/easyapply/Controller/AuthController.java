@@ -154,6 +154,7 @@ public ResponseEntity<?> registerCompany(@RequestBody RegisterCRequest request) 
     }
     
     @GetMapping("/offres")
+    @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
     @Operation(summary = "Récupérer les offres d'emploi", description = "Obtenir la liste des offres d'emploi disponibles")
     public ResponseEntity<?> getAllOffres(){
            return ResponseEntity.ok(offreEmploiService.getAllOffres());

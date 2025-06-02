@@ -29,16 +29,7 @@ public class JobController {
     @Operation(summary = "Créer une nouvelle offre d'emploi", description = "Permet à une entreprise de créer une nouvelle offre d'emploi")
     public ResponseEntity<?> createJob(@RequestBody JobRequest request) {
         try {
-            // Validation
-            if (request.getTitre() == null || request.getTitre().isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Le titre est requis"));
-            }
-            if (request.getDescription() == null || request.getDescription().isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "La description est requise"));
-            }
-            if (request.getEntrepriseId() == null) {
-                return ResponseEntity.badRequest().body(Map.of("error", "L'ID de l'entreprise est requis"));
-            }
+            
 
             OffreEmploi job = jobService.createJob(request);
             return ResponseEntity.ok(Map.of(

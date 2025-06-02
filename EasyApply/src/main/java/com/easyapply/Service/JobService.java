@@ -30,6 +30,7 @@ public class JobService {
         }
 
         OffreEmploi job = new OffreEmploi();
+         // Remplacez par l'ID de l'entreprise approprié
         job.setTitre(request.getTitre());
         job.setDescription(request.getDescription());
         job.setMotsCles(request.getMotsCles());
