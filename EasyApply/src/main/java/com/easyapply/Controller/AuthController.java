@@ -3,7 +3,7 @@ package com.easyapply.Controller;
 
 import java.time.LocalDate;
 
-import java.util.Map;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -56,9 +56,11 @@ public class AuthController {
     @Autowired
     private CandidatService candidatService;
     @Autowired
+    private OffreEmploiService offreEmploiService; // Assure-toi que ce service existe
+    @Autowired
     private EntrepriseService entrepriseService;
      @Autowired
-    private OffreEmploiService offreEmploiService; // Assure-toi que ce service existe
+    private JobService jobService; // Assure-toi que ce service existe
 
     @PostMapping("/register")
     @Operation(summary = "Inscription d'un nouvel utilisateur", description = "Créer un nouveau compte utilisateur sur EasyApply")
@@ -154,10 +156,15 @@ public ResponseEntity<?> registerCompany(@RequestBody RegisterCRequest request) 
     }
     
     @GetMapping("/offres")
-    @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
     @Operation(summary = "Récupérer les offres d'emploi", description = "Obtenir la liste des offres d'emploi disponibles")
-    public ResponseEntity<?> getAllOffres(){
-           return ResponseEntity.ok(offreEmploiService.getAllOffres());
+    public ResponseEntity<List<OffreEmploi>> getAllOffres() {
+        try {
+            List<OffreEmploi> offres = offreEmploiService.getAllOffres();
+            return ResponseEntity.ok(offres);
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(null); // Or use a custom error response: Map.of("error", e.getMessage())
+        }
     }
 
     @GetMapping("/offres/{id}")

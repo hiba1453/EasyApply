@@ -1,10 +1,62 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter } from 'lucide-react';
 import JobList from '../../../components/jobs/JobList';
 import Card from '../../../components/ui/Card';
-import { mockJobs } from '../../../utils/mockData';
+
+interface Job {
+  id: number;
+  titre: string;
+  description: string;
+  motsCles: string;
+ 
+  dateExpiration: string;
+  lieu: string;
+  typeContrat: string;
+  salaire: string;
+  entrepriseNom: string;
+  niveauExperience: string;
+}
 
 const CandidateJobs: React.FC = () => {
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch jobs from the backend
+  useEffect(() => {
+    const fetchJobs = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:8090/offres', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+          },
+          credentials: 'include',
+          mode: 'cors'
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Erreur lors de la récupération des offres');
+        }
+
+        const data = await response.json();
+        setJobs(data);
+      } catch (err: any) {
+        console.error('Error fetching jobs:', err);
+        setError(err.message || 'Une erreur est survenue lors du chargement des offres');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
   return (
     <div>
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
@@ -112,11 +164,35 @@ const CandidateJobs: React.FC = () => {
         
         {/* Job Listings */}
         <div className="lg:col-span-3">
-          <JobList 
-            jobs={mockJobs} 
-            title="" 
-            description="" 
-          />
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+              <p className="mt-2 text-gray-600">Chargement des offres...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-8 text-red-500">
+              <p>{error}</p>
+            </div>
+          ) : (
+            <JobList 
+              jobs={jobs.map(job => ({
+                id: String(job.id),
+                title: job.titre,
+                description: job.description,
+                company: job.entrepriseNom,
+                location: job.lieu,
+                salary: job.salaire,
+                contractType: job.typeContrat,
+                experienceLevel: job.niveauExperience,
+                keywords: job.motsCles,
+                expirationDate: job.dateExpiration,
+                tags: job.motsCles ? job.motsCles.split(',').map(tag => tag.trim()) : [],
+                postedDate: job.dateExpiration // Replace with the correct posted date property if available
+              }))} 
+              title="" 
+              description="" 
+            />
+          )}
         </div>
       </div>
     </div>

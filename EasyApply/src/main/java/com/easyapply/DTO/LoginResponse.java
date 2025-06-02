@@ -5,7 +5,7 @@ public class LoginResponse {
     private String role;
     private Long userId;
 
-    public LoginResponse(String token, String role) {
+    public LoginResponse(String token, String role, Long userId) {
         this.token = token;
         this.role = role;
         this.userId = userId;

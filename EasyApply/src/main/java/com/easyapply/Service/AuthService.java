@@ -72,7 +72,7 @@ public class AuthService {
         httpSession.setAttribute("USER_ROLE", role);
         httpSession.setAttribute("USER_EMAIL", email);
         
-        return new LoginResponse(token, role);
+        return new LoginResponse(token, role,id);
         
     }
    
