@@ -167,15 +167,7 @@ public ResponseEntity<?> registerCompany(@RequestBody RegisterCRequest request) 
         }
     }
 
-    @GetMapping("/offres/{id}")
-    public ResponseEntity<?> getOffreById(@PathVariable Long id) {
-        try {
-            OffreEmploiResponse offre = offreEmploiService.getOffreById(id);
-            return ResponseEntity.ok(offre);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
+   
 
 
    
