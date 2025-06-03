@@ -1,26 +1,108 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Search } from 'lucide-react';
 import Button from '../../../components/ui/Button';
 import JobForm from '../../../components/jobs/JobForm';
 import Card from '../../../components/ui/Card';
 import JobCard from '../../../components/jobs/JobCard';
-import { mockJobs } from '../../../utils/mockData';
+import { useNavigate } from 'react-router-dom';
+import { JobPosting } from '../../../types';
+
+interface Job {
+  id: string;
+  titre: string;
+  description: string;
+  lieu: string;
+  salaire: string;
+  typeContrat: string;
+  niveauExperience: string;
+  motsCles: string;
+  datePublication: string;
+  dateExpiration: string;
+  entrepriseNom: string;
+}
 
 const CompanyJobs: React.FC = () => {
   const [isCreating, setIsCreating] = useState(false);
-  const [jobs, setJobs] = useState(mockJobs);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCompanyJobs = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
+
+        if (!token || !userId) {
+          navigate('/login');
+          return;
+        }
+
+        const response = await fetch(`http://localhost:8090/api/jobs/company/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401 || response.status === 403) {
+            navigate('/login');
+            return;
+          }
+          throw new Error('Erreur lors de la récupération des offres');
+        }
+
+        const data = await response.json();
+        setJobs(data.jobs || []);
+      } catch (err: any) {
+        console.error('Error fetching company jobs:', err);
+        setError(err.message || 'Une erreur est survenue lors du chargement des offres');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCompanyJobs();
+  }, [navigate]);
 
   const handleCreateJob = (jobData: any) => {
-    // In a real app, you would send this to the server
-    const newJob = {
-      ...jobData,
-      id: (jobs.length + 1).toString(),
-      postedDate: new Date().toISOString().split('T')[0],
-    };
-    
-    setJobs([newJob, ...jobs]);
+    setJobs([jobData, ...jobs]);
     setIsCreating(false);
   };
+
+  const mapJobToJobPosting = (job: Job): JobPosting => ({
+    id: job.id,
+    title: job.titre,
+    company: job.entrepriseNom,
+    location: job.lieu,
+    salary: job.salaire,
+    description: job.description,
+    tags: job.motsCles ? job.motsCles.split(',').map(tag => tag.trim()) : [],
+    postedDate: job.datePublication
+  });
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-red-500">{error}</p>
+        <Button onClick={() => window.location.reload()} className="mt-4">
+          Réessayer
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -77,8 +159,13 @@ const CompanyJobs: React.FC = () => {
               
               <div className="space-y-4">
                 {jobs.map(job => (
-                  <JobCard key={job.id} job={job} showActions={false} />
+                  <JobCard key={job.id} job={mapJobToJobPosting(job)} showActions={true} />
                 ))}
+                {jobs.length === 0 && (
+                  <p className="text-gray-500 text-center py-4">
+                    Vous n'avez pas encore publié d'offres d'emploi.
+                  </p>
+                )}
               </div>
             </Card>
             
@@ -89,56 +176,25 @@ const CompanyJobs: React.FC = () => {
               
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-3xl font-bold text-primary-600 mb-1">32</div>
+                  <div className="text-3xl font-bold text-primary-600 mb-1">
+                    {jobs.length}
+                  </div>
+                  <div className="text-gray-600 text-sm">Offres actives</div>
+                </div>
+                
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="text-3xl font-bold text-green-600 mb-1">-</div>
                   <div className="text-gray-600 text-sm">Candidatures reçues</div>
                 </div>
                 
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-3xl font-bold text-green-600 mb-1">5</div>
-                  <div className="text-gray-600 text-sm">Entretiens planifiés</div>
-                </div>
-                
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-3xl font-bold text-blue-600 mb-1">152</div>
+                  <div className="text-3xl font-bold text-blue-600 mb-1">-</div>
                   <div className="text-gray-600 text-sm">Vues totales</div>
                 </div>
                 
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-3xl font-bold text-purple-600 mb-1">21%</div>
+                  <div className="text-3xl font-bold text-purple-600 mb-1">-</div>
                   <div className="text-gray-600 text-sm">Taux de conversion</div>
-                </div>
-              </div>
-              
-              <h4 className="font-medium text-gray-800 mb-3">Activité récente</h4>
-              <div className="space-y-3">
-                <div className="flex items-start">
-                  <div className="w-2 h-2 rounded-full bg-green-500 mt-1.5 mr-2"></div>
-                  <div>
-                    <p className="text-gray-800 text-sm">
-                      Nouvelle candidature pour Développeur Frontend React
-                    </p>
-                    <p className="text-gray-500 text-xs">Il y a 1 heure</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5 mr-2"></div>
-                  <div>
-                    <p className="text-gray-800 text-sm">
-                      15 nouvelles vues sur Data Scientist
-                    </p>
-                    <p className="text-gray-500 text-xs">Il y a 3 heures</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="w-2 h-2 rounded-full bg-yellow-500 mt-1.5 mr-2"></div>
-                  <div>
-                    <p className="text-gray-800 text-sm">
-                      L'offre UX/UI Designer expire dans 7 jours
-                    </p>
-                    <p className="text-gray-500 text-xs">Il y a 5 heures</p>
-                  </div>
                 </div>
               </div>
             </Card>

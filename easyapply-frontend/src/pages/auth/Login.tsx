@@ -15,29 +15,19 @@ const Login: React.FC = () => {
         },
         body: JSON.stringify({
           email: data.email,
-          motDePasse: data.motDePasse,  // Use motDePasse from data
+          motDePasse: data.motDePasse,
         }),
         credentials: 'include',
       });
-      console.log("Sending login request with data:", {
-        email: data.email,
-        motDePasse: data.motDePasse,
-      });
-      // Check if the response is ok
-      console.error("Response status:", response);
 
       const result = await response.json();
 
-      console.log("Login response:", result);
-
       if (response.ok) {
-        // Store token and role
+        // Store token, role and userId
         localStorage.setItem('token', result.token);
         localStorage.setItem('role', result.role);
+        localStorage.setItem('userId', result.userId.toString());
         
-        console.log("Login successful:", result.role);
-
-
         // Redirect based on role
         switch(result.role) {
           case 'ADMIN':
@@ -57,6 +47,7 @@ const Login: React.FC = () => {
         alert(result.error || "Erreur lors de la connexion");
       }
     } catch (error) {
+      console.error('Login error:', error);
       alert("Erreur réseau");
     }
   };
