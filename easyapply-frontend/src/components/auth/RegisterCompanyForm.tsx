@@ -203,22 +203,26 @@ const RegisterCompanyForm: React.FC<RegisterCompanyFormProps> = ({ onSubmit }) =
         <Button type="submit" fullWidth>
           Créer le compte entreprise
         </Button>
-      </form>
 
-      <div className="text-center mt-4">
-        <p className="text-sm text-gray-600">
-          Vous avez déjà un compte ?{' '}
-          <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
-            Connectez-vous
-          </Link>
-        </p>
-        <p className="text-sm text-gray-600 mt-2">
-          Vous êtes un candidat ?{' '}
-          <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500">
-            S'inscrire comme candidat
-          </Link>
-        </p>
-      </div>
+        <div className="space-y-2">
+          <div className="text-center">
+            <p className="text-sm text-gray-600">
+              Vous avez déjà un compte ?{' '}
+              <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
+                Connectez-vous
+              </Link>
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-gray-600">
+              Vous êtes un candidat ?{' '}
+              <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500">
+                S'inscrire comme candidat
+              </Link>
+            </p>
+          </div>
+        </div>
+      </form>
     </div>
   );
 };

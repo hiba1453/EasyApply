@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import Input from '../../components/ui/Input';
-import PasswordInput from '../../components/ui/PasswordInput';
-import Button from '../../components/ui/Button';
+import { Link } from 'react-router-dom';
+import Input from '../ui/Input';
+import PasswordInput from '../ui/PasswordInput';
+import Button from '../ui/Button';
 
 interface RegisterFormProps {
   onSubmit?: (data: any) => void;
@@ -20,7 +20,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -78,34 +77,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
     e.preventDefault();
 
     if (validateForm()) {
-      // On retire confirmedMotDePasse avant l'envoi
       const { confirmedMotDePasse, ...submitData } = formData;
-
-      try {
-        const response = await fetch('http://localhost:8090/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(submitData),
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          setServerError(result.error || "Erreur lors de l'inscription. Vérifiez les champs.");
-        } else {
-          if (onSubmit) onSubmit(result);
-          navigate('/login');
-        }
-      } catch (error) {
-        setServerError("Erreur réseau. Impossible de contacter le serveur.");
+      if (onSubmit) {
+        onSubmit(submitData);
       }
     }
   };
 
   return (
-    <div className="max-w-md w-full space-y-6">
+    <>
       <div className="text-center">
         <h2 className="text-3xl font-bold text-gray-900">Créer un compte</h2>
         <p className="mt-2 text-gray-600">
@@ -113,7 +93,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
         </p>
       </div>
 
-      {serverError && <div className="text-red-500 text-sm text-center">{serverError}</div>}
+      {serverError && <div className="text-red-500 text-sm text-center mt-4">{serverError}</div>}
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         <Input
@@ -187,17 +167,27 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
         <Button type="submit" fullWidth>
           S'inscrire
         </Button>
-      </form>
 
-      <div className="text-center mt-4">
-        <p className="text-sm text-gray-600">
-          Vous avez déjà un compte ?{' '}
-          <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
-            Connectez-vous
-          </Link>
-        </p>
-      </div>
-    </div>
+        <div className="space-y-2">
+          <div className="text-center">
+            <p className="text-sm text-gray-600">
+              Vous avez déjà un compte ?{' '}
+              <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
+                Connectez-vous
+              </Link>
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-gray-600">
+              Vous êtes une entreprise ?{' '}
+              <Link to="/register/company" className="font-medium text-primary-600 hover:text-primary-500">
+                S'inscrire comme entreprise
+              </Link>
+            </p>
+          </div>
+        </div>
+      </form>
+    </>
   );
 };
 
