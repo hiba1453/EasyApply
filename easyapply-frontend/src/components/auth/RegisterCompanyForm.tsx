@@ -89,8 +89,12 @@ const RegisterCompanyForm: React.FC<RegisterCompanyFormProps> = ({ onSubmit }) =
           return;
         } else {
           const result = await response.json();
-          console.log("Inscription entreprise réussie :", result);
-          alert("Inscription entreprise réussie !");
+          console.log("Réponse complète du serveur :", JSON.stringify(result, null, 2));
+          alert(`Inscription entreprise réussie !
+
+Votre identifiant entreprise est : ${result.entrepriseId}
+
+Conservez cet identifiant, il pourra vous être utile.`);
           if (onSubmit) onSubmit(result);
         }
       } catch (error) {
