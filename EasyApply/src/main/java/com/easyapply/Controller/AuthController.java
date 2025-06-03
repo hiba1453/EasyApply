@@ -167,8 +167,7 @@ public ResponseEntity<?> registerCompany(@RequestBody RegisterCRequest request) 
         }
     }
 
-   
-
+    
 
    
 }

@@ -28,19 +28,33 @@ public class JwtService {
                 .compact();
     }
 
-    public Claims extractAllClaims(String token) {
+    public Claims extractClaims(String token) {
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
     }
 
-    public String extractUsername(String token) {
-        return extractAllClaims(token).getSubject();
+    public Long getUserId(String token) {
+        Claims claims = extractClaims(token);
+        return ((Number) claims.get("id")).longValue(); // Extract "id" claim as Long
+    }
+
+    public String getRole(String token) {
+        return extractClaims(token).get("role", String.class);
     }
 
     public boolean isTokenValid(String token) {
-        final Date expiration = extractAllClaims(token).getExpiration();
-        return !expiration.before(new Date());
+        try {
+            Claims claims = extractClaims(token);
+            return !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
     }
+
+    private boolean isTokenExpired(String token) {
+        return extractClaims(token).getExpiration().before(new Date());
+    }
+  
 }

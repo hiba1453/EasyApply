@@ -29,10 +29,7 @@ public class AuthService {
     @Autowired
     private AdminRepository adminRepository;
    
-     @Autowired
-    private HttpSession httpSession; // Add this line
-
-    
+     
     @Autowired
     private JwtService jwtService;
     
@@ -68,27 +65,11 @@ public class AuthService {
         claims.put("role", role);
         
         String token = jwtService.generateToken(claims, email);
-        httpSession.setAttribute("USER_ID", id);
-        httpSession.setAttribute("USER_ROLE", role);
-        httpSession.setAttribute("USER_EMAIL", email);
-        
+       
         return new LoginResponse(token, role,id);
         
     }
    
-    // Add method to check session
-    public boolean isAuthenticated() {
-        return httpSession.getAttribute("USER_ID") != null;
-    }
-
-    // Add method to get current user ID
-    public Long getCurrentUserId() {
-        return (Long) httpSession.getAttribute("USER_ID");
-    }
-
-    // Add method to get current user role
-    public String getCurrentUserRole() {
-        return (String) httpSession.getAttribute("USER_ROLE");
-    }
+    
     
 }

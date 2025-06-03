@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.*;
 import com.easyapply.DTO.JobRequest;
 import com.easyapply.Service.JobService;
 import com.easyapply.entity.OffreEmploi;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.easyapply.config.CustomUserDetails;
 
 @RestController
 @RequestMapping("/api/jobs")
@@ -29,7 +32,24 @@ public class JobController {
     @Operation(summary = "Créer une nouvelle offre d'emploi", description = "Permet à une entreprise de créer une nouvelle offre d'emploi")
     public ResponseEntity<?> createJob(@RequestBody JobRequest request) {
         try {
-            
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
+                return ResponseEntity.status(401).body(Map.of("error", "Utilisateur non authentifié"));
+            }
+
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            Long userId = userDetails.getUserId();
+            String role = userDetails.getRole();
+
+            System.out.println("Authenticated userId: " + userId + ", role: " + role); // Debug log
+
+            if (!"ENTREPRISE".equals(role)) {
+                return ResponseEntity.status(403).body(Map.of("error", "Seules les entreprises peuvent créer des offres"));
+            }
+           if(!request.getEntrepriseId().equals(userId)) {
+                return ResponseEntity.badRequest().body(Map.of("error", "vous ne pouvez pas créer une offre pour une autre entreprise"));
+            }
+
 
             OffreEmploi job = jobService.createJob(request);
             return ResponseEntity.ok(Map.of(

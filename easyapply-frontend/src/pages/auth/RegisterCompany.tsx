@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Briefcase } from 'lucide-react';
 import RegisterCompanyForm from '../../components/auth/RegisterCompanyForm';
 
-const RegisterCompany: React.FC = () => {
+const RegisterCompany = () => {
   const navigate = useNavigate();
 
   const handleRegister = async (data: any) => {
