@@ -35,9 +35,11 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .addFilterBefore(new JwtAuthenticationFilter(jwtService), UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login").permitAll()
+                .requestMatchers("/login/**", "/api/auth/**", "/loginCallback", "/api/check-session").permitAll()
+                .requestMatchers("/offres").permitAll()
                 .requestMatchers("/register/**").permitAll()
                 .requestMatchers("/api/**").hasRole("ENTREPRISE")
+                .requestMatchers("/dashboard/candidat/**").hasRole("CANDIDAT")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
@@ -64,9 +66,13 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(Arrays.asList("Set-Cookie", "Location"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+    
+
 }

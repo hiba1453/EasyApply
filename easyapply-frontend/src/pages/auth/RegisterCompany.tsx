@@ -1,35 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Briefcase } from 'lucide-react';
 import RegisterCompanyForm from '../../components/auth/RegisterCompanyForm';
 
 const RegisterCompany = () => {
   const navigate = useNavigate();
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [entrepriseId, setEntrepriseId] = useState<number | null>(null);
 
   const handleRegister = async (data: any) => {
-  try {
-    // ✅ Envoi au backend
-    const response = await fetch('http://localhost:8090/register/company', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
+    try {
+      const response = await fetch('http://localhost:8090/register/company', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
 
-    
-
-    const result = await response.json();
-    console.log('Entreprise créée:', result);
-    
-    // ✅ Redirection après succès
-      navigate('/login', { 
-      state: { message: 'Inscription réussie ! Connectez-vous.' }
-    });
-    
-  } catch (error) {
-    console.error('Erreur:', error);
-    
-  }
-};
+      const result = await response.json();
+      if (response.ok) {
+        setSuccessMsg(result.message);
+        setEntrepriseId(result.entrepriseId);
+        // Si tu veux rediriger après 3 secondes :
+        // setTimeout(() => navigate('/login', { state: { message: result.message } }), 3000);
+      } else {
+        setSuccessMsg(result.error || "Erreur lors de l'inscription.");
+        setEntrepriseId(null);
+      }
+    } catch (error) {
+      setSuccessMsg("Erreur réseau ou serveur.");
+      setEntrepriseId(null);
+      console.error('Erreur:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen flex">
@@ -82,7 +84,15 @@ const RegisterCompany = () => {
               <span className="text-2xl font-bold text-primary-800">EasyApply</span>
             </Link>
           </div>
-          
+          {/* Message de succès */}
+          {successMsg && (
+            <div className="mb-4 p-4 bg-green-100 text-green-800 rounded">
+              {successMsg}
+              {entrepriseId && (
+                <div>ID de l'entreprise : <b>{entrepriseId}</b></div>
+              )}
+            </div>
+          )}
           <RegisterCompanyForm onSubmit={handleRegister} />
         </div>
       </div>

@@ -8,10 +8,7 @@ import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.easyapply.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +17,12 @@ import org.springframework.stereotype.Service;
 
 import com.easyapply.Repository.CandidatRepository;
 
-import com.easyapply.entity.Candidat;
-import com.easyapply.entity.Entreprise;
+import com.easyapply.entity.*;
+
 
 import com.easyapply.DTO.*;
-import com.easyapply.Repository.CandidatRepository;
-import com.easyapply.entity.Candidat;
+import com.easyapply.Repository.*;
+
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;  // ← Import important !
@@ -36,7 +33,6 @@ import io.swagger.v3.oas.annotations.Operation;  // ← Import important !
 import io.swagger.v3.oas.annotations.tags.Tag;
 import com.easyapply.Service.*;
 import com.easyapply.Repository.*;
-import com.easyapply.DTO.RegisterCRequest;
 
 @RestController
 
@@ -86,7 +82,7 @@ public class AuthController {
                 return ResponseEntity.badRequest().body(Map.of("error", "La date de naissance est requise"));
             }
 
-            // Parse dateNaissance
+          
             LocalDate dateNaissance;
             try {
                 dateNaissance = LocalDate.parse(request.getDateNaissance());
@@ -124,9 +120,9 @@ public ResponseEntity<?> registerCompany(@RequestBody RegisterCRequest request) 
             return ResponseEntity.badRequest().body(Map.of("error", "Le secteur d'activité est requis"));
         }
 
-        entrepriseService.registerEntreprise(request);
+        Entreprise savedEntreprise = entrepriseService.registerEntreprise(request);
 
-        return ResponseEntity.ok(Map.of("message", "Inscription entreprise réussie !"));
+        return ResponseEntity.ok(Map.of("message", "Inscription entreprise réussie !", "entreprise", request.getNom(), "id", savedEntreprise.getId()));
     } catch (Exception e) {
         return ResponseEntity.internalServerError().body(Map.of("error", "Erreur lors de l'inscription: " + e.getMessage()));
     }
@@ -167,6 +163,7 @@ public ResponseEntity<?> registerCompany(@RequestBody RegisterCRequest request) 
         }
     }
 
+    
     
 
    

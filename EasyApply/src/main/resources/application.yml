@@ -57,3 +57,13 @@ logging:
     com.easyapply: DEBUG
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
+
+
+linkedin:
+  client-id: ${LINKEDIN_CLIENT_ID:78wfcpplim9cxr}
+  client-secret: ${LINKEDIN_CLIENT_SECRET:WPL_AP1.Lk49VmDETSQTIZpO.k/r/Kg==}
+  redirect-uri: http://localhost:8090/api/auth/linkedin/callback
+  scope: r_liteprofile,r_emailaddress,w_member_social
+  authorize-url: https://www.linkedin.com/oauth/v2/authorization
+  token-url: https://www.linkedin.com/oauth/v2/accessToken
+  user-info-url: https://api.linkedin.com/v2/userinfo

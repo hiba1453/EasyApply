@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
 import PasswordInput from '../ui/PasswordInput';
+import { FaLinkedin } from 'react-icons/fa';
 
 interface RegisterCompanyFormProps {
   onSubmit?: (data: any) => void;
@@ -90,7 +91,7 @@ const RegisterCompanyForm: React.FC<RegisterCompanyFormProps> = ({ onSubmit }) =
         } else {
           const result = await response.json();
           console.log("Inscription entreprise réussie :", result);
-          alert("Inscription entreprise réussie !");
+          alert(result.message );
           if (onSubmit) onSubmit(result);
         }
       } catch (error) {
@@ -98,6 +99,17 @@ const RegisterCompanyForm: React.FC<RegisterCompanyFormProps> = ({ onSubmit }) =
         alert("Erreur réseau. Impossible de contacter le serveur.");
       }
     }
+  };
+
+  const handleLinkedinButton = () => {
+    const clientId = "773tqf9qc1colw";
+    const redirectUri = encodeURIComponent("http://localhost:3000/linkedInLogin"); // Mets ici ton redirectUri
+    const state = "foobar"; // Génère un vrai state en prod
+    const scope = "r_liteprofile%20r_emailaddress";
+
+    const linkedinUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}`;
+
+    window.location.href = linkedinUrl;
   };
 
   return (
@@ -219,6 +231,15 @@ const RegisterCompanyForm: React.FC<RegisterCompanyFormProps> = ({ onSubmit }) =
           </Link>
         </p>
       </div>
+
+      <button
+        type="button"
+        onClick={handleLinkedinButton}
+        className="w-full flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white py-2 px-4 rounded"
+      >
+        <FaLinkedin />
+        Se connecter avec LinkedIn
+      </button>
     </div>
   );
 };

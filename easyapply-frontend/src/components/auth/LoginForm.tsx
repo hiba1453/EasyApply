@@ -83,6 +83,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
     }
   };
 
+  // Fonction pour le bouton LinkedIn
+  const handleLinkedinButton = () => {
+    const clientId = '78wfcpplim9cxr'; // Replace with your LinkedIn Client ID
+    const redirectUri = encodeURIComponent('http://localhost:8090/api/auth/linkedin/callback');
+    const scope = encodeURIComponent('openid profile email');
+    const state = Math.random().toString(36).substring(2); // Random state for security
+    const authorizeUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}`;
+
+    window.location.href = authorizeUrl; // Redirect to LinkedIn for authentication
+  };
+
   return (
     <div className="max-w-md w-full space-y-6">
       <div className="text-center">
@@ -143,9 +154,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
       {/* Bouton LinkedIn */}
       <div className="mt-6">
         <button
-          onClick={() => window.location.href = 'http://localhost:8090/login'}
+          type="button"
+          onClick={handleLinkedinButton}
           className="w-full flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white py-2 px-4 rounded">
-          <FaLinkedin  />
+          <FaLinkedin />
           Se connecter avec LinkedIn
         </button>
       </div>
