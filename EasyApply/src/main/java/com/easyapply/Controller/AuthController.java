@@ -120,9 +120,12 @@ public ResponseEntity<?> registerCompany(@RequestBody RegisterCRequest request) 
             return ResponseEntity.badRequest().body(Map.of("error", "Le secteur d'activité est requis"));
         }
 
-        Entreprise savedEntreprise = entrepriseService.registerEntreprise(request);
+        Entreprise entreprise = entrepriseService.registerEntreprise(request);
 
-        return ResponseEntity.ok(Map.of("message", "Inscription entreprise réussie !", "entreprise", request.getNom(), "id", savedEntreprise.getId()));
+        return ResponseEntity.ok(Map.of(
+            "message", "Inscription entreprise réussie !",
+            "entrepriseId", entreprise.getId()
+        ));
     } catch (Exception e) {
         return ResponseEntity.internalServerError().body(Map.of("error", "Erreur lors de l'inscription: " + e.getMessage()));
     }

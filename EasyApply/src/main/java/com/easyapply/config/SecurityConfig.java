@@ -40,6 +40,9 @@ public class SecurityConfig {
                 .requestMatchers("/register/**").permitAll()
                 .requestMatchers("/api/**").hasRole("ENTREPRISE")
                 .requestMatchers("/dashboard/candidat/**").hasRole("CANDIDAT")
+                .requestMatchers("/api/jobs/company/**").hasRole("ENTREPRISE")
+                .requestMatchers("/api/jobs").hasRole("ENTREPRISE")
+                .requestMatchers("/offres/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
@@ -51,7 +54,7 @@ public class SecurityConfig {
 
     @Bean
     public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
-        return new DefaultOAuth2UserService(); // Placeholder; customize as needed
+        return new DefaultOAuth2UserService();
     }
 
     @Bean

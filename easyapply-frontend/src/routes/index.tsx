@@ -10,9 +10,8 @@ import DashboardLayout from '../components/layout/DashboardLayout';
 import CandidateJobs from '../pages/dashboard/candidate/CandidateJobs';
 import CandidateResume from '../pages/dashboard/candidate/CandidateResume';
 import CandidateApplications from '../pages/dashboard/candidate/CandidateApplications';
-import CompanyJobs from '../pages/dashboard/company/CompanyDashboard';
+import CompanyJobs from '../pages/dashboard/company/CompanyJobs';
 import RegisterCompany from '../pages/auth/RegisterCompany';
-
 
 const Router: React.FC = () => {
   return (
@@ -49,23 +48,48 @@ const Router: React.FC = () => {
           } 
         />
 
-        <Route path="/dashboard/company" element={<CompanyDashboard />} />
-        <Route path="/dashboard/company/jobs" element={<CompanyJobs />} />
-        <Route path="/dashboard/company/jobs/create" element={<JobForm />} />
-        <Route path="/dashboard/company/jobs/edit/:id" element={<JobForm />} />
+        {/* Company dashboard routes */}
+        <Route 
+          path="/dashboard/company" 
+          element={
+            <DashboardLayout>
+              <CompanyDashboard />
+            </DashboardLayout>
+          } 
+        />
+        <Route 
+          path="/dashboard/company/jobs" 
+          element={
+            <DashboardLayout>
+              <CompanyJobs />
+            </DashboardLayout>
+          } 
+        />
+        <Route 
+          path="/dashboard/company/jobs/create" 
+          element={
+            <DashboardLayout>
+              <JobForm />
+            </DashboardLayout>
+          } 
+        />
+        <Route 
+          path="/dashboard/company/jobs/edit/:id" 
+          element={
+            <DashboardLayout>
+              <JobForm />
+            </DashboardLayout>
+          } 
+        />
 
         <Route
          path="/register/company"
-         element={<RegisterCompany />} />
-
-        
-        
-       
-        
+         element={<RegisterCompany />} 
+        />
         
         {/* Redirects */}
-        <Route path="/dashboard" element={<Navigate to="/dashboard/candidate/jobs\" replace />} />
-        <Route path="*" element={<Navigate to="/\" replace />} />
+        <Route path="/dashboard" element={<Navigate to="/dashboard/candidate/jobs" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

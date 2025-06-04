@@ -90,8 +90,12 @@ const RegisterCompanyForm: React.FC<RegisterCompanyFormProps> = ({ onSubmit }) =
           return;
         } else {
           const result = await response.json();
-          console.log("Inscription entreprise réussie :", result);
-          alert(result.message );
+          console.log("Réponse complète du serveur :", JSON.stringify(result, null, 2));
+          alert(`Inscription entreprise réussie !
+
+Votre identifiant entreprise est : ${result.entrepriseId}
+
+Conservez cet identifiant, il pourra vous être utile.`);
           if (onSubmit) onSubmit(result);
         }
       } catch (error) {
@@ -215,31 +219,26 @@ const RegisterCompanyForm: React.FC<RegisterCompanyFormProps> = ({ onSubmit }) =
         <Button type="submit" fullWidth>
           Créer le compte entreprise
         </Button>
+
+        <div className="space-y-2">
+          <div className="text-center">
+            <p className="text-sm text-gray-600">
+              Vous avez déjà un compte ?{' '}
+              <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
+                Connectez-vous
+              </Link>
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-gray-600">
+              Vous êtes un candidat ?{' '}
+              <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500">
+                S'inscrire comme candidat
+              </Link>
+            </p>
+          </div>
+        </div>
       </form>
-
-      <div className="text-center mt-4">
-        <p className="text-sm text-gray-600">
-          Vous avez déjà un compte ?{' '}
-          <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
-            Connectez-vous
-          </Link>
-        </p>
-        <p className="text-sm text-gray-600 mt-2">
-          Vous êtes un candidat ?{' '}
-          <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500">
-            S'inscrire comme candidat
-          </Link>
-        </p>
-      </div>
-
-      <button
-        type="button"
-        onClick={handleLinkedinButton}
-        className="w-full flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white py-2 px-4 rounded"
-      >
-        <FaLinkedin />
-        Se connecter avec LinkedIn
-      </button>
     </div>
   );
 };
