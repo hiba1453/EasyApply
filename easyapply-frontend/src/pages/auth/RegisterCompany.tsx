@@ -5,8 +5,7 @@ import RegisterCompanyForm from '../../components/auth/RegisterCompanyForm';
 
 const RegisterCompany = () => {
   const navigate = useNavigate();
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
-  const [entrepriseId, setEntrepriseId] = useState<number | null>(null);
+  
 
   const handleRegister = async (data: any) => {
     try {
@@ -18,17 +17,18 @@ const RegisterCompany = () => {
 
       const result = await response.json();
       if (response.ok) {
-        setSuccessMsg(result.message);
-        setEntrepriseId(result.entrepriseId);
+        console.log("Inscription réussie :", result);
+        
+          alert(`Inscription entreprise réussie !
+            Votre identifiant entreprise est : ${result.entrepriseId}
+            Conservez cet identifiant, il pourra vous être utile.`);
+           navigate('/login', { state: { message: result.message } });
+       
         // Si tu veux rediriger après 3 secondes :
         // setTimeout(() => navigate('/login', { state: { message: result.message } }), 3000);
-      } else {
-        setSuccessMsg(result.error || "Erreur lors de l'inscription.");
-        setEntrepriseId(null);
-      }
+  }
     } catch (error) {
-      setSuccessMsg("Erreur réseau ou serveur.");
-      setEntrepriseId(null);
+      
       console.error('Erreur:', error);
     }
   };
@@ -85,14 +85,7 @@ const RegisterCompany = () => {
             </Link>
           </div>
           {/* Message de succès */}
-          {successMsg && (
-            <div className="mb-4 p-4 bg-green-100 text-green-800 rounded">
-              {successMsg}
-              {entrepriseId && (
-                <div>ID de l'entreprise : <b>{entrepriseId}</b></div>
-              )}
-            </div>
-          )}
+          
           <RegisterCompanyForm onSubmit={handleRegister} />
         </div>
       </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
 import PasswordInput from '../ui/PasswordInput';
@@ -10,6 +10,7 @@ interface RegisterCompanyFormProps {
 }
 
 const RegisterCompanyForm: React.FC<RegisterCompanyFormProps> = ({ onSubmit }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nom: '',
     email: '',
@@ -96,8 +97,8 @@ const RegisterCompanyForm: React.FC<RegisterCompanyFormProps> = ({ onSubmit }) =
 Votre identifiant entreprise est : ${result.entrepriseId}
 
 Conservez cet identifiant, il pourra vous être utile.`);
-          if (onSubmit) onSubmit(result);
         }
+        navigate('/login', { state: { message: "Inscription réussie ! Vous pouvez maintenant vous connecter." } });
       } catch (error) {
         console.error("Erreur réseau :", error);
         alert("Erreur réseau. Impossible de contacter le serveur.");
@@ -219,28 +220,25 @@ Conservez cet identifiant, il pourra vous être utile.`);
         <Button type="submit" fullWidth>
           Créer le compte entreprise
         </Button>
+        </form>
 
-        <div className="space-y-2">
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Vous avez déjà un compte ?{' '}
-              <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
-                Connectez-vous
-              </Link>
-            </p>
+        <div className="text-center mt-4">
+        <p className="text-sm text-gray-600">
+          Vous avez déjà un compte ?{' '}
+          <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
+            Connectez-vous
+          </Link>
+        </p>
+          <p className="text-sm text-gray-600 mt-2">
+          Vous êtes un candidat ?{' '}
+          <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500">
+            S'inscrire comme candidat
+          </Link>
+        </p>
+      </div>
           </div>
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Vous êtes un candidat ?{' '}
-              <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500">
-                S'inscrire comme candidat
-              </Link>
-            </p>
-          </div>
-        </div>
-      </form>
-    </div>
+       
   );
-};
+}
 
 export default RegisterCompanyForm;
