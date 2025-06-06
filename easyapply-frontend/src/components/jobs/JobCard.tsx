@@ -9,9 +9,10 @@ import { JobPosting } from '../../types';
 interface JobCardProps {
   job: JobPosting;
   showActions?: boolean;
+  onDelete?: (id: string) => void;
 }
 
-const JobCard: React.FC<JobCardProps> = ({ job, showActions = true }) => {
+const JobCard: React.FC<JobCardProps> = ({ job, showActions = true, onDelete }) => {
   const { id, title, company, location, salary, tags, postedDate } = job;
 
   // Calculate days ago
@@ -63,6 +64,11 @@ const JobCard: React.FC<JobCardProps> = ({ job, showActions = true }) => {
             <Link to={`/apply/${id}`}>
               <Button variant="primary" size="sm">Postuler</Button>
             </Link>
+            {onDelete && (
+              <Button variant="outline" size="sm" onClick={() => onDelete(id)}>
+                Supprimer
+              </Button>
+            )}
           </div>
         )}
       </div>
