@@ -8,13 +8,15 @@ interface Job {
   titre: string;
   description: string;
   motsCles: string;
- 
+  datePublication: string;
   dateExpiration: string;
   lieu: string;
   typeContrat: string;
   salaire: string;
-  entrepriseNom: string;
   niveauExperience: string;
+  entreprise: {
+    nom: string;
+  };
 }
 
 const CandidateJobs: React.FC = () => {
@@ -22,33 +24,48 @@ const CandidateJobs: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch jobs from the backend
   useEffect(() => {
     const fetchJobs = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:8090/offres', {
+        const response = await fetch('http://localhost:8090/offres', { // Fixed endpoint to /api/offres
           method: 'GET',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
           },
-          credentials: 'include',
-          mode: 'cors'
         });
 
+        console.log('Jobs response status:', response.status);
+        console.log('Jobs response headers:', Object.fromEntries(response.headers.entries()));
+
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Erreur lors de la récupération des offres');
+          let errorData: any = {};
+          try {
+            errorData = await response.json();
+            console.log('Jobs error response body:', errorData);
+          } catch (e) {
+            console.error('Failed to parse jobs error response:', e);
+          }
+          throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
         }
 
         const data = await response.json();
-        setJobs(data);
-      } catch (err: any) {
-        console.error('Error fetching jobs:', err);
-        setError(err.message || 'Une erreur est survenue lors du chargement des offres');
+        console.log('Jobs success response body:', data);
+        setJobs(data || []); // Ensure jobs is an array
+      } catch (err) {
+        console.error(
+          'Error fetching jobs:',
+          err && typeof err === 'object' && 'message' in err && typeof (err as any).message === 'string'
+            ? (err as any).message
+            : err
+        );
+        setError(
+          err && typeof err === 'object' && 'message' in err && typeof (err as any).message === 'string'
+            ? (err as any).message
+            : 'Une erreur est survenue lors du chargement des offres'
+        );
       } finally {
         setLoading(false);
       }
@@ -66,7 +83,6 @@ const CandidateJobs: React.FC = () => {
             Voici les offres qui correspondent le mieux à votre profil
           </p>
         </div>
-        
         <div className="mt-4 md:mt-0 flex space-x-2">
           <div className="relative">
             <input
@@ -82,15 +98,12 @@ const CandidateJobs: React.FC = () => {
           </button>
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Sidebar */}
         <div className="lg:col-span-1">
           <Card>
             <h3 className="font-semibold text-lg mb-4">Affiner la recherche</h3>
-            
             <div className="space-y-6">
-              {/* Location filter */}
               <div>
                 <h4 className="font-medium text-gray-700 mb-2">Localisation</h4>
                 <div className="space-y-2">
@@ -112,8 +125,6 @@ const CandidateJobs: React.FC = () => {
                   </label>
                 </div>
               </div>
-              
-              {/* Contract type filter */}
               <div>
                 <h4 className="font-medium text-gray-700 mb-2">Type de contrat</h4>
                 <div className="space-y-2">
@@ -135,8 +146,6 @@ const CandidateJobs: React.FC = () => {
                   </label>
                 </div>
               </div>
-              
-              {/* Experience level filter */}
               <div>
                 <h4 className="font-medium text-gray-700 mb-2">Expérience</h4>
                 <div className="space-y-2">
@@ -161,8 +170,7 @@ const CandidateJobs: React.FC = () => {
             </div>
           </Card>
         </div>
-        
-        {/* Job Listings */}
+
         <div className="lg:col-span-3">
           {loading ? (
             <div className="text-center py-8">
@@ -174,23 +182,19 @@ const CandidateJobs: React.FC = () => {
               <p>{error}</p>
             </div>
           ) : (
-            <JobList 
+            <JobList
               jobs={jobs.map(job => ({
-                id: String(job.id),
-                title: job.titre,
-                description: job.description,
-                company: job.entrepriseNom,
-                location: job.lieu,
-                salary: job.salaire,
-                contractType: job.typeContrat,
-                experienceLevel: job.niveauExperience,
-                keywords: job.motsCles,
-                expirationDate: job.dateExpiration,
-                tags: job.motsCles ? job.motsCles.split(',').map(tag => tag.trim()) : [],
-                postedDate: job.dateExpiration // Replace with the correct posted date property if available
-              }))} 
-              title="" 
-              description="" 
+                ...job,
+                candidatures: [],
+                recommandations: [],
+                entreprise: {
+                  id: (job.entreprise as any)?.id ?? 0,
+                  nom: job.entreprise.nom,
+                  email: (job.entreprise as any)?.email ?? '',
+                  secteur: (job.entreprise as any)?.secteur ?? '',
+                  description: (job.entreprise as any)?.description ?? '',
+                },
+              }))}
             />
           )}
         </div>

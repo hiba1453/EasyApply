@@ -40,6 +40,7 @@ public class CV {
     public String getNomFichier() {
         return nomFichier;
     }
+    
     public void setNomFichier(String nomFichier) {
         this.nomFichier = nomFichier;
     }

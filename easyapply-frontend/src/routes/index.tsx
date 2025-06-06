@@ -12,6 +12,11 @@ import CandidateResume from '../pages/dashboard/candidate/CandidateResume';
 import CandidateApplications from '../pages/dashboard/candidate/CandidateApplications';
 import CompanyJobs from '../pages/dashboard/company/CompanyJobs';
 import RegisterCompany from '../pages/auth/RegisterCompany';
+import ApplyJob from '../components/jobs/ApplyJob';
+import JobDetails from '../components/jobs/JobDetails';
+
+
+
 
 const Router: React.FC = () => {
   return (
@@ -89,7 +94,30 @@ const Router: React.FC = () => {
         
         {/* Redirects */}
         <Route path="/dashboard" element={<Navigate to="/dashboard/candidate/jobs" replace />} />
+        
+        {/* Job details route - Move this before the catch-all route */}
+        <Route 
+          path="/dashboard/candidate/jobs/:id" 
+          element={
+            <DashboardLayout>
+              <JobDetails />
+            </DashboardLayout>
+          }
+        />
+
+        {/* Apply route */}
+        <Route 
+          path="/apply/:id" 
+          element={
+            <ApplyJob />
+          }
+        />
+
+        {/* Keep this at the end */}
         <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Add more routes as needed */}
+        {/* Example of a protected route */}
+        {/* <Route path="/protected" element={<ProtectedComponent />} /> */}
       </Routes>
     </BrowserRouter>
   );

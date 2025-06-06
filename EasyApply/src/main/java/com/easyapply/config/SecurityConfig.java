@@ -36,10 +36,10 @@ public class SecurityConfig {
             .addFilterBefore(new JwtAuthenticationFilter(jwtService), UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login/**", "/api/auth/**", "/loginCallback", "/api/check-session").permitAll()
-                .requestMatchers("/offres").permitAll()
                 .requestMatchers("/register/**").permitAll()
                 .requestMatchers("/api/**").hasRole("ENTREPRISE")
-                .requestMatchers("/dashboard/candidat/**").hasRole("CANDIDAT")
+                .requestMatchers("/offre/**").permitAll()
+                .requestMatchers("/dashboard/candidate/**").hasRole("CANDIDAT")    
                 .requestMatchers("/api/jobs/company/**").hasRole("ENTREPRISE")
                 .requestMatchers("/api/jobs").hasRole("ENTREPRISE")
                 .requestMatchers("/offres/**").permitAll()

@@ -5,15 +5,28 @@ export interface User {
   type: 'candidate' | 'company';
 }
 
-export interface JobPosting {
-  id: string;
-  title: string;
-  company: string;
-  location: string;
-  salary: string;
+export interface Entreprise {
+  id: number;
+  nom: string;
+  email: string;
+  secteur: string;
   description: string;
-  tags: string[];
-  postedDate: string;
+}
+
+export interface JobPosting {
+  id: number;
+  titre: string;
+  description: string;
+  motsCles: string;
+  datePublication: string;
+  dateExpiration: string;
+  lieu: string;
+  salaire: string;
+  typeContrat: string;
+  niveauExperience: string;
+  entreprise: Entreprise;
+  candidatures: any[];
+  recommandations: any[];
 }
 
 export interface Application {

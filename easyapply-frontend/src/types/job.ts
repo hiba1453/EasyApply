@@ -1,14 +1,18 @@
 export interface JobPosting {
   id: string;
-  title: string;
-  company: string;
-  location: string;
-  salary: string;
+  titre: string;
   description: string;
-  type: string;
-  requirements: string[];
-  postedDate: string;
-  deadline: string;
+  entreprise: {
+    nom: string;
+  };
+  lieu?: string;
+  salaire?: string;
+  typeContrat?: string;
+  niveauExperience?: string;
+  motsCles?: string;
+  datePublication: string;
+  dateExpiration?: string;
+  tags?: string[];
 }
 
 export interface JobFilters {
