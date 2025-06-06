@@ -3,22 +3,29 @@ import { Plus, Search } from 'lucide-react';
 import Button from '../../../components/ui/Button';
 import JobForm from '../../../components/jobs/JobForm';
 import Card from '../../../components/ui/Card';
-import JobCard from '../../../components/jobs/JobCard';
+import JobCardCompany from '../../../components/jobs/JobCardCompany';
 import { useNavigate } from 'react-router-dom';
 import { JobPosting } from '../../../types';
+import Tag from '../../../components/ui/Tag';
 
 interface Job {
-  id: string;
+  id: number;
   titre: string;
   description: string;
-  lieu: string;
-  salaire: string;
-  typeContrat: string;
-  niveauExperience: string;
   motsCles: string;
   datePublication: string;
   dateExpiration: string;
-  entrepriseNom: string;
+  lieu: string;
+  typeContrat: string;
+  salaire: string;
+  niveauExperience: string;
+  entreprise: {
+    id: number;
+    nom: string;
+    email: string;
+    secteur: string;
+    description: string;
+  };
 }
 
 const CompanyJobs: React.FC = () => {
@@ -75,18 +82,23 @@ const CompanyJobs: React.FC = () => {
   };
 
   const mapJobToJobPosting = (job: Job): JobPosting => ({
-    id: job.id,
-    title: job.titre,
-    company: job.entrepriseNom,
-    location: job.lieu,
-    salary: job.salaire,
+    id: Number(job.id),
+    titre: job.titre,
+    entreprise: job.entreprise,
+    lieu: job.lieu,
+    salaire: job.salaire,
     description: job.description,
-    tags: job.motsCles ? job.motsCles.split(',').map(tag => tag.trim()) : [],
-    postedDate: job.datePublication
+    dateExpiration: job.dateExpiration,
+    motsCles: job.motsCles, // <-- reste string
+    typeContrat: job.typeContrat,
+    datePublication: job.datePublication,
+    niveauExperience: job.niveauExperience,
+    candidatures: [], // Remplacez ceci par les vraies données si disponibles
+    recommandations: [], // Remplacez ceci par les vraies données si disponibles
   });
 
   // Fonction pour supprimer une offre
-  const handleDeleteJob = async (id: string) => {
+  const handleDeleteJob = async (id: number) => {
     if (!window.confirm("Voulez-vous vraiment supprimer cette offre ?")) return;
     try {
       const token = localStorage.getItem('token');
@@ -179,9 +191,21 @@ const CompanyJobs: React.FC = () => {
               </div>
               
               <div className="space-y-4">
-                {jobs.map(job => (
-                  <JobCard key={job.id} job={mapJobToJobPosting(job)} showActions={true} onDelete={handleDeleteJob} />
-                ))}
+                {jobs.map(job => {
+                  const tags = job.motsCles ? job.motsCles.split(',').map(tag => tag.trim()) : [];
+                  return (
+                    <div key={job.id}>
+                      <JobCardCompany job={mapJobToJobPosting(job)} showActions={true} onDelete={handleDeleteJob} />
+                      {tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {tags.map((tag, index) => (
+                            <Tag key={index} label={tag} color={index % 2 === 0 ? 'blue' : 'gray'} size="sm" />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
                 {jobs.length === 0 && (
                   <p className="text-gray-500 text-center py-4">
                     Vous n'avez pas encore publié d'offres d'emploi.
