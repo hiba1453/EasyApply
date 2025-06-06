@@ -85,6 +85,27 @@ const CompanyJobs: React.FC = () => {
     postedDate: job.datePublication
   });
 
+  // Fonction pour supprimer une offre
+  const handleDeleteJob = async (id: string) => {
+    if (!window.confirm("Voulez-vous vraiment supprimer cette offre ?")) return;
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:8090/api/jobs/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Erreur lors de la suppression de l\'offre');
+      }
+      setJobs(jobs.filter(job => job.id !== id));
+    } catch (err: any) {
+      alert(err.message || 'Erreur lors de la suppression');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -159,7 +180,7 @@ const CompanyJobs: React.FC = () => {
               
               <div className="space-y-4">
                 {jobs.map(job => (
-                  <JobCard key={job.id} job={mapJobToJobPosting(job)} showActions={true} />
+                  <JobCard key={job.id} job={mapJobToJobPosting(job)} showActions={true} onDelete={handleDeleteJob} />
                 ))}
                 {jobs.length === 0 && (
                   <p className="text-gray-500 text-center py-4">

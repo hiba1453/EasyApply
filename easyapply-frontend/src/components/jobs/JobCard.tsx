@@ -9,14 +9,11 @@ import { JobPosting } from '../../types';
 interface JobCardProps {
   job: JobPosting;
   showActions?: boolean;
+  onDelete?: (id: string) => void;
 }
 
-const JobCard: React.FC<JobCardProps> = ({ job, showActions = true }) => {
-  const { id, titre, entreprise, lieu, salaire, motsCles, datePublication } = job;
-  const [showDetails, setShowDetails] = React.useState(false);
-
-  // Split motsCles into tags
-  const tags = motsCles ? motsCles.split(',').map(tag => tag.trim()) : [];
+const JobCard: React.FC<JobCardProps> = ({ job, showActions = true, onDelete }) => {
+  const { id, title, company, location, salary, tags, postedDate } = job;
 
   // Calculate days ago
   const getDaysAgo = (dateString: string) => {
@@ -86,12 +83,17 @@ const JobCard: React.FC<JobCardProps> = ({ job, showActions = true }) => {
         
         {showActions && (
           <div className="flex flex-col md:flex-row gap-2 mt-4 md:mt-0">
-            <Button variant="secondary" size="sm" onClick={() => setShowDetails(v => !v)}>
-              {showDetails ? "Masquer les détails" : "Voir détails"}
-            </Button>
-            <Button variant="primary" size="sm" onClick={handleApply}>
-              Postuler
-            </Button>
+            <Link to={`/dashboard/candidate/jobs/${id}`}>
+              <Button variant="secondary" size="sm">Voir détails</Button>
+            </Link>
+            <Link to={`/apply/${id}`}>
+              <Button variant="primary" size="sm">Postuler</Button>
+            </Link>
+            {onDelete && (
+              <Button variant="outline" size="sm" onClick={() => onDelete(id)}>
+                Supprimer
+              </Button>
+            )}
           </div>
         )}
       </div>

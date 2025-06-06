@@ -29,7 +29,11 @@ interface JobFormData {
   urgent: boolean;
 }
 
-const JobForm: React.FC = () => {
+interface JobFormProps {
+  onSubmit?: (jobData: any) => void;
+}
+
+const JobForm: React.FC<JobFormProps> = ({ onSubmit }) => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = Boolean(id);
@@ -175,6 +179,9 @@ const JobForm: React.FC = () => {
       }
 
       await response.json();
+      if (onSubmit) {
+        onSubmit(jobData);
+      }
       navigate('/dashboard/company', { replace: true });
       
     } catch (error: any) {
