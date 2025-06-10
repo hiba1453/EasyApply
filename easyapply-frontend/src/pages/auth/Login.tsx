@@ -27,6 +27,9 @@ const Login: React.FC = () => {
         localStorage.setItem('token', result.token);
         localStorage.setItem('role', result.role);
         localStorage.setItem('userId', result.userId.toString());
+        if(result.role === 'ENTREPRISE' && result.companyName) {
+          localStorage.setItem('companyName', result.companyName);
+        }
         
         // Redirect based on role
         switch(result.role) {
