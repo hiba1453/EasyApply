@@ -14,6 +14,7 @@ import CompanyJobs from '../pages/dashboard/company/CompanyJobs';
 import RegisterCompany from '../pages/auth/RegisterCompany';
 import ApplyJob from '../components/jobs/ApplyJob';
 import JobDetails from '../components/jobs/JobDetails';
+import CompanyApplications from '../pages/dashboard/company/CompanyApplications';
 
 
 
@@ -83,6 +84,14 @@ const Router: React.FC = () => {
           element={
             <DashboardLayout>
               <JobForm />
+            </DashboardLayout>
+          } 
+        />
+        <Route 
+          path="/dashboard/company/applications" 
+          element={
+            <DashboardLayout>
+              <CompanyApplications />
             </DashboardLayout>
           } 
         />

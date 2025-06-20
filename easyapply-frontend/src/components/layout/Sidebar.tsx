@@ -4,9 +4,10 @@ import { Briefcase, FileText, Send, BarChart, Users, Settings, LogOut } from 'lu
 
 interface SidebarProps {
   userType: 'candidate' | 'company';
+  companyName?: string;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ userType }) => {
+const Sidebar: React.FC<SidebarProps> = ({ userType, companyName }) => {
   const location = useLocation();
   
   return (
@@ -141,7 +142,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userType }) => {
           </div>
           <div>
             <p className="font-medium text-gray-800">
-              {userType === 'candidate' ? 'Thomas Dubois' : 'Claire Martin'}
+              {userType === 'candidate' ? 'Thomas Dubois' : companyName || 'Claire Martin'}
             </p>
             <p className="text-xs text-gray-500">
               {userType === 'candidate' ? 'Candidat' : 'Recruteur'}
