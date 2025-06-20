@@ -63,4 +63,40 @@ public class Profil {
     public void setCandidat(Candidat candidat) {
         this.candidat = candidat;
     }
+    public List<Competence> getCompetences() {
+        return competences;
+    }
+    public void setCompetences(List<Competence> competences) {
+        this.competences = competences;
+    }
+    public List<Experience> getExperiences() {
+        return experiences;
+    }
+    public void setExperiences(List<Experience> experiences) {
+        this.experiences = experiences;
+    }
+    public List<Formation> getFormations() {
+        return formations;
+    }
+    public void setFormations(List<Formation> formations) {
+        this.formations = formations;
+    }
+    public List<Langue> getLangues() {
+        return langues;
+    }
+    public void setLangues(List<Langue> langues) {
+        this.langues = langues;
+    }
+    @Override
+    public String toString() {
+        return "Profil{" +
+                "id=" + id +
+                ", titreProfessionnel='" + titreProfessionnel + '\'' +
+                ", competences=" + competences +
+                ", experiences=" + experiences +
+                ", formations=" + formations +
+                ", langues=" + langues +
+                ", candidat=" + candidat +
+                '}';
+    }
 }

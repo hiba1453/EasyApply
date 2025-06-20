@@ -3,6 +3,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -23,10 +26,13 @@ public class CV {
     private boolean estParDefaut = false;
     
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "candidat_id", nullable = false)
     private Candidat candidat;
     
     @OneToMany(mappedBy = "cv")
+    @JsonManagedReference
+
     private List<Candidature> candidatures = new ArrayList<>();
     
     // Getters, setters, constructeurs...

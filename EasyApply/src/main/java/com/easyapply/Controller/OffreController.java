@@ -14,7 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
@@ -111,6 +114,34 @@ public class OffreController {
         } catch (Exception e) {
             return ResponseEntity.status(500)
                 .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/cv")
+    public ResponseEntity<?> uploadCv(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+        try {
+            Long candidatId = getCandidatIdFromRequest(request);
+
+            // Find the candidate
+            Optional<Candidat> candidatOpt = candidatRepository.findById(candidatId);
+            if (candidatOpt.isEmpty()) {
+                return ResponseEntity.status(404).body(Map.of("error", "Candidat non trouvé"));
+            }
+            Candidat candidat = candidatOpt.get();
+
+            // Create and save the CV entity
+            CV cv = new CV();
+            cv.setCandidat(candidat);
+            cv.setNomFichier(file.getOriginalFilename());
+           
+            cv.setDateUpload(LocalDateTime.now());
+
+            cv.setEstParDefaut(true); // Set as default CV
+            cvRepository.save(cv);
+
+            return ResponseEntity.ok(Map.of("message", "CV ajouté avec succès"));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(Map.of("error", e.getMessage()));
         }
     }
 

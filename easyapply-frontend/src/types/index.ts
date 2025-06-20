@@ -48,10 +48,30 @@ export interface Company {
 export interface Resume {
   id: string;
   userId: string;
-  education: ResumeEducation[];
-  experience: ResumeExperience[];
+  fullName: string;
+  jobTitle: string;
+  email: string;
+  location: string;
+  experience: {
+    title: string;
+    company: string;
+    location: string;
+    startDate: string;
+    endDate: string;
+    description: string;
+  }[];
+  education: {
+    institution: string;
+    degree: string;
+    field: string;
+    startDate: string;
+    endDate: string;
+  }[];
   skills: string[];
-  languages: ResumeLanguage[];
+  languages: {
+    name: string;
+    level: string;
+  }[];
 }
 
 export interface ResumeEducation {

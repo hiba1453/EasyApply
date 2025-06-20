@@ -1,6 +1,8 @@
 package com.easyapply.entity;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -24,10 +26,12 @@ public class Candidature {
     
     @Id
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "offre_id", nullable = false)
     private OffreEmploi offre;
     
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "cv_id")
     private CV cv;
     

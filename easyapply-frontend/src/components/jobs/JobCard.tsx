@@ -14,6 +14,7 @@ interface JobCardProps {
 const JobCard: React.FC<JobCardProps> = ({ job, showActions = true }) => {
   const { id, titre, entreprise, lieu, salaire, motsCles, datePublication } = job;
   const [showDetails, setShowDetails] = React.useState(false);
+  const [showAddCv, setShowAddCv] = React.useState(false);
 
   // Split motsCles into tags
   const tags = motsCles ? motsCles.split(',').map(tag => tag.trim()) : [];
@@ -42,7 +43,12 @@ const JobCard: React.FC<JobCardProps> = ({ job, showActions = true }) => {
       if (response.ok) {
         alert(data.message || "Candidature soumise avec succès !");
       } else {
-        alert(data.error || "Erreur lors de la candidature.");
+        if (data.error && data.error.includes("CV")) {
+          // If the error is about missing CV, show the add CV section
+          setShowAddCv(true);
+        } else {
+          alert(data.error || "Erreur lors de la candidature.");
+        }
       }
     } catch (err) {
       alert("Erreur réseau lors de la candidature.");
@@ -110,6 +116,41 @@ const JobCard: React.FC<JobCardProps> = ({ job, showActions = true }) => {
           <p><b>Nombre de candidatures :</b> {job.candidatures?.length ?? 0}</p>
 
           {/* Ajoute d'autres infos si besoin */}
+        </div>
+      )}
+
+      {showAddCv && (
+        <div className="mt-4 p-4 bg-yellow-50 border border-yellow-300 rounded">
+          <h4 className="font-semibold mb-2 text-yellow-800">Vous devez ajouter un CV pour postuler</h4>
+          {/* Replace below with your actual CV upload form/component */}
+          <form
+            onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
+              e.preventDefault();
+              const form = e.currentTarget;
+              const fileInput = form.elements.namedItem('cv') as HTMLInputElement;
+              if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+                alert("Veuillez sélectionner un fichier CV.");
+                return;
+              }
+              const formData = new FormData();
+              formData.append('file', fileInput.files[0]);
+              const response = await fetch('http://localhost:8090/offre/cv', {
+                method: 'POST',
+                credentials: 'include',
+                body: formData,
+              });
+              const data = await response.json();
+              if (response.ok) {
+                setShowAddCv(false);
+                alert("CV ajouté avec succès ! Vous pouvez maintenant postuler.");
+              } else {
+                alert(data.error || "Erreur lors de l'ajout du CV.");
+              }
+            }}
+          >
+            <input type="file" name="cv" accept=".pdf,.doc,.docx" required className="mb-2" />
+            <Button type="submit" variant="primary" size="sm">Ajouter mon CV</Button>
+          </form>
         </div>
       )}
     </Card>

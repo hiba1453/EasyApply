@@ -2,6 +2,8 @@ package com.easyapply.entity;
 import java.time.LocalDate;
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -29,6 +31,7 @@ public class Candidat {
     
     @OneToMany(mappedBy = "candidat", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("estParDefaut DESC, dateUpload DESC")
+    @JsonManagedReference
     private List<CV> cvs = new ArrayList<>();
     
     @OneToMany(mappedBy = "candidat", cascade = CascadeType.ALL, orphanRemoval = true)

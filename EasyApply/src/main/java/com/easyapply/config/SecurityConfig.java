@@ -39,6 +39,8 @@ public class SecurityConfig {
                 .requestMatchers("/register/**").permitAll()
                 .requestMatchers("/api/**").hasRole("ENTREPRISE")
                 .requestMatchers("/offre/**").permitAll()
+                .requestMatchers("/api/candidat/profile/**").hasRole("CANDIDAT")
+    
                 .requestMatchers("/dashboard/candidate/**").hasRole("CANDIDAT")    
                 .requestMatchers("/api/jobs/company/**").hasRole("ENTREPRISE")
                 .requestMatchers("/api/jobs").hasRole("ENTREPRISE")

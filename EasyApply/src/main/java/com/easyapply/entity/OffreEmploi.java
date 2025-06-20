@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,6 +40,7 @@ public class OffreEmploi {
     private String lieu;
     private String salaire;
     private String typeContrat;
+    
     private String niveauExperience;
     
     @ManyToOne
@@ -45,6 +48,7 @@ public class OffreEmploi {
     private Entreprise entreprise;
     
     @OneToMany(mappedBy = "offre", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
     private List<Candidature> candidatures = new ArrayList<>();
     
     @OneToMany(mappedBy = "offre", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -31,11 +31,11 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ resume, onEdit }) => {
       <Card className="bg-white shadow-md border border-gray-200 mb-8">
         <div className="px-8 py-10">
           <header className="border-b border-gray-200 pb-6 mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Thomas Dubois</h1>
-            <p className="text-primary-600 font-medium text-lg mb-3">Développeur Frontend</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">{resume.fullName}</h1>
+            <p className="text-primary-600 font-medium text-lg mb-3">{resume.jobTitle}</p>
             <div className="text-gray-600">
-              <p>thomas@example.com</p>
-              <p>Paris, France</p>
+              <p>{resume.email}</p>
+              <p>{resume.location}</p>
             </div>
           </header>
 
@@ -47,7 +47,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ resume, onEdit }) => {
                   <div className="flex justify-between mb-1">
                     <h4 className="font-semibold text-gray-800">{exp.title}</h4>
                     <span className="text-sm text-gray-500">
-                      {exp.startDate} - {exp.endDate === 'Present' ? 'Présent' : exp.endDate}
+                      {exp.startDate} - {exp.endDate || 'Présent'}
                     </span>
                   </div>
                   <p className="text-primary-600 mb-1">{exp.company}, {exp.location}</p>
@@ -77,8 +77,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ resume, onEdit }) => {
               <h3 className="text-xl font-semibold mb-4 text-gray-800">Compétences</h3>
               <div className="flex flex-wrap gap-2">
                 {skills.map((skill, index) => (
-                  <span 
-                    key={index} 
+                  <span
+                    key={index}
                     className="bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-sm font-medium"
                   >
                     {skill}
